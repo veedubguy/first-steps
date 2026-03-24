@@ -75,6 +75,7 @@ export default function ParentAcknowledgement() {
     e.preventDefault();
     if (!parentName.trim()) { setError('Please enter your full name.'); return; }
     if (!agreed) { setError('Please check the acknowledgement box.'); return; }
+    if (!parentSig) { setError('Please sign before submitting.'); return; }
     setError('');
     signMutation.mutate();
   };
