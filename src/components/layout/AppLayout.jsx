@@ -14,9 +14,9 @@ export default function AppLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Mobile header */}
-      <header className="lg:hidden sticky top-0 z-50 bg-card border-b px-4 py-3 flex items-center justify-between">
+      <header className="lg:hidden shrink-0 z-50 bg-card border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Shield className="w-6 h-6 text-primary" />
           <span className="font-semibold text-foreground">OSHC Care Plans</span>
@@ -26,10 +26,10 @@ export default function AppLayout() {
         </Button>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside className={cn(
-          "fixed inset-y-0 left-0 z-40 w-60 bg-card border-r transform transition-transform duration-200 lg:translate-x-0 lg:static lg:z-auto",
+          "fixed inset-y-0 left-0 z-40 w-60 bg-card border-r transform transition-transform duration-200 lg:translate-x-0 lg:static lg:z-auto lg:shrink-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}>
           <div className="p-5 hidden lg:flex items-center gap-2.5">
@@ -69,8 +69,8 @@ export default function AppLayout() {
         )}
 
         {/* Main content */}
-        <main className="flex-1 min-h-screen lg:min-h-screen">
-          <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto">
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto pb-10">
             <Outlet />
           </div>
         </main>
