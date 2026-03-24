@@ -195,6 +195,16 @@ export default function ChildProfile() {
           {markSignedMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
           Mark Plan Signed
         </Button>
+        <Button
+          variant="outline" size="sm" className="gap-2 border-green-300 text-green-700 hover:bg-green-50"
+          onClick={() => {
+            const url = `${window.location.origin}/parent-acknowledgement?child=${id}`;
+            navigator.clipboard.writeText(url);
+            toast.success('Parent link copied — ready to paste into SMS');
+          }}
+        >
+          <Link2 className="w-3.5 h-3.5" /> Copy Parent Link
+        </Button>
         <Link to={`/children/${id}/print`}>
           <Button variant="outline" size="sm" className="gap-2">
             <Printer className="w-3.5 h-3.5" /> Print Plan
