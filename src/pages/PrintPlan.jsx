@@ -149,26 +149,32 @@ export default function PrintPlan() {
           <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 mb-3">Parent / Guardian Acknowledgement</h2>
           <div className="px-3 text-sm space-y-4">
             <p>I acknowledge that I have read and understood this plan, and that the information provided is accurate.</p>
-            <div className="grid grid-cols-2 gap-8 items-end">
-              <div>
-                {parentSig ? (
-                  <div>
-                    <p className="font-medium mb-1">Parent / Guardian Signature:</p>
-                    <img src={parentSig} alt="Parent signature" className="h-16 border-b border-black w-full object-contain object-left" />
-                  </div>
-                ) : (
+            {savedParentSig ? (
+              <div className="grid grid-cols-2 gap-8 items-end">
+                <div>
+                  <p className="font-medium mb-1">Parent / Guardian Signature:</p>
+                  {savedParentName && <p className="text-xs text-gray-500 mb-1">Signed by: {savedParentName}</p>}
+                  <img src={savedParentSig} alt="Parent signature" className="h-16 border-b border-black w-full object-contain object-left" />
+                </div>
+                <div>
+                  <p className="font-medium mb-1">Date Signed:</p>
+                  <p className="border-b border-black pb-1">{savedSignedDate || parentSigDate}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-8 items-end">
+                <div>
                   <div className="no-print">
-                    <SignaturePad label="Parent / Guardian Signature:" onSave={setParentSig} />
+                    <SignaturePad label="Parent / Guardian Signature:" onSave={() => {}} />
                   </div>
-                )}
-                {/* Print-only blank line if no sig */}
-                {!parentSig && <div className="print-only hidden print:block border-b border-black mt-10"></div>}
+                  <div className="hidden print:block border-b border-black mt-10"></div>
+                </div>
+                <div>
+                  <p className="font-medium mb-1">Date:</p>
+                  <p className="border-b border-black pb-1"></p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium mb-1">Date:</p>
-                <p className="border-b border-black pb-1">{parentSig ? parentSigDate : ''}</p>
-              </div>
-            </div>
+            )}
           </div>
         </section>
 
