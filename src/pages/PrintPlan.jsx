@@ -62,7 +62,8 @@ export default function PrintPlan() {
         {/* Header */}
         <div className="border-b-2 border-black pb-4 mb-6">
           <h1 className="text-xl font-bold uppercase tracking-wide">
-            {child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' : 'Dietary Management Plan'}
+            {child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' :
+             child.condition_type === 'Asthma' ? 'Asthma Management Plan' : 'Dietary Management Plan'}
           </h1>
           <p className="text-sm text-gray-600 mt-1">OSHC Service — Confidential Document</p>
           <p className="text-sm text-gray-600">Generated: {format(new Date(), 'dd MMMM yyyy')}</p>
@@ -85,6 +86,14 @@ export default function PrintPlan() {
             )}
             {child.condition_type === 'Dietary' && (
               <div><span className="font-medium">Requirement:</span> {child.dietary_requirement || '—'}</div>
+            )}
+            {child.condition_type === 'Asthma' && (
+              <>
+                <div><span className="font-medium">Triggers:</span> {child.asthma_triggers || '—'}</div>
+                <div><span className="font-medium">Severity:</span> {child.asthma_severity || '—'}</div>
+                <div><span className="font-medium">Reliever:</span> {child.reliever_medication || '—'}</div>
+                {child.preventer_medication && <div><span className="font-medium">Preventer:</span> {child.preventer_medication}</div>}
+              </>
             )}
           </div>
         </section>
