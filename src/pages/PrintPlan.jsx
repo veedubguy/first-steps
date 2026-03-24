@@ -252,8 +252,8 @@ export default function PrintPlan() {
             {activePlans.filter(p => p.medication_required).map(plan => (
               <tr key={plan.id}>
                 <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px' }}>{plan.medication_required}</td>
-                <td style={TD}></td>
-                <td style={TD}></td>
+                <td style={TD}>{plan.medication_expiry_date ? format(new Date(plan.medication_expiry_date), 'dd/MM/yyyy') : ''}</td>
+                <td style={TD}>{plan.medication_supplied_by || ''}{plan.medication_supplied_date ? ` – ${format(new Date(plan.medication_supplied_date), 'dd/MM/yyyy')}` : ''}</td>
                 <td style={TD}></td>
                 <td style={TD}>{plan.medication_location || ''}</td>
                 <td style={TD}></td>

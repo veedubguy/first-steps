@@ -29,6 +29,9 @@ export default function RiskPlanForm() {
     control_measures: '',
     medication_required: '',
     medication_location: '',
+    medication_expiry_date: '',
+    medication_supplied_by: '',
+    medication_supplied_date: '',
     review_date: '',
     status: 'Active',
   });
@@ -51,6 +54,9 @@ export default function RiskPlanForm() {
         control_measures: p.control_measures || '',
         medication_required: p.medication_required || '',
         medication_location: p.medication_location || '',
+        medication_expiry_date: p.medication_expiry_date || '',
+        medication_supplied_by: p.medication_supplied_by || '',
+        medication_supplied_date: p.medication_supplied_date || '',
         review_date: p.review_date || '',
         status: p.status || 'Active',
       });
@@ -141,6 +147,18 @@ export default function RiskPlanForm() {
             <div className="space-y-1.5">
               <Label>Medication Location</Label>
               <Input value={form.medication_location} onChange={e => update('medication_location', e.target.value)} placeholder="e.g. First Aid Room" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Medication Expiry Date</Label>
+              <Input type="date" value={form.medication_expiry_date} onChange={e => update('medication_expiry_date', e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Supplied By</Label>
+              <Input value={form.medication_supplied_by} onChange={e => update('medication_supplied_by', e.target.value)} placeholder="e.g. Parent name" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Date Supplied</Label>
+              <Input type="date" value={form.medication_supplied_date} onChange={e => update('medication_supplied_date', e.target.value)} />
             </div>
           </div>
         </Card>
