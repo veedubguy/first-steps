@@ -48,6 +48,7 @@ export default function SendToStaffModal({ open, onClose, child }) {
 
         // Send email
         await base44.integrations.Core.SendEmail({
+          from_name: 'First Steps OSHC',
           to: s.email,
           subject: `Action Required: Please sign off on ${childName}'s Risk Minimisation Plan`,
           body: `Dear ${s.full_name},\n\nPlease review and sign the Risk Minimisation Plan for ${childName}.\n\nClick the link below to complete your acknowledgement:\n\n${signoffUrl}\n\nThis acknowledgement confirms you have read the medical conditions policy, are informed about the child's condition, and know the location of all relevant plans and medications.\n\nKind regards,\nFirst Steps Before & After School Care`,
