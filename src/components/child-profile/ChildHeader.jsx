@@ -14,7 +14,8 @@ export default function ChildHeader({ child }) {
           <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-xl font-bold">{child.first_name} {child.last_name}</h2>
             <StatusBadge type={child.condition_type} />
-            {child.severity && <StatusBadge type={child.severity} />}
+            {child.condition_type === 'Asthma' && child.asthma_severity && <StatusBadge type={child.asthma_severity} />}
+            {child.condition_type !== 'Asthma' && child.severity && <StatusBadge type={child.severity} />}
           </div>
           <div className="text-sm text-muted-foreground space-y-1">
             {child.child_id && <p>ID: {child.child_id}</p>}
@@ -32,6 +33,22 @@ export default function ChildHeader({ child }) {
             <div className="mt-2">
               <p className="text-xs font-medium text-muted-foreground uppercase">Dietary Requirement</p>
               <p className="text-sm font-medium text-purple-600 mt-0.5">{child.dietary_requirement}</p>
+            </div>
+          )}
+          {child.condition_type === 'Asthma' && (
+            <div className="mt-2 space-y-1">
+              {child.asthma_triggers && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase">Triggers</p>
+                  <p className="text-sm font-medium text-blue-600 mt-0.5">{child.asthma_triggers}</p>
+                </div>
+              )}
+              {child.reliever_medication && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase">Reliever</p>
+                  <p className="text-sm mt-0.5">{child.reliever_medication}</p>
+                </div>
+              )}
             </div>
           )}
         </div>

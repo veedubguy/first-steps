@@ -18,6 +18,9 @@ const variants = {
   closed: { label: 'Closed', className: 'bg-slate-100 text-slate-600 border-slate-200' },
   allergy: { label: 'Allergy', className: 'bg-red-50 text-red-600 border-red-200' },
   dietary: { label: 'Dietary', className: 'bg-purple-50 text-purple-600 border-purple-200' },
+  asthma: { label: 'Asthma', className: 'bg-blue-50 text-blue-600 border-blue-200' },
+  mild: { label: '🟢 Mild', className: 'bg-green-100 text-green-700 border-green-200' },
+  severe: { label: '🔴 Severe', className: 'bg-red-100 text-red-700 border-red-200' },
 };
 
 export default function StatusBadge({ type, label: customLabel }) {
