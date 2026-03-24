@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2 } from 'lucide-react';
+import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ChildHeader from '@/components/child-profile/ChildHeader';
@@ -57,6 +57,57 @@ export default function ChildProfile() {
       queryClient.invalidateQueries({ queryKey: ['planTracking', id] });
       toast.success('Plan marked as sent');
     },
+  });
+
+  const sendToParentMutation = useMutation({
+    mutationFn: async () => {
+      if (!child?.parent_email) throw new Error('No parent email on record');
+      const planRecord = planTracking.find(p => p.plan_status === 'Draft') || planTracking[0];
+      const planParam = planRecord ? `&plan=${planRecord.id}` : '';
+      const ackUrl = `${window.location.origin}/parent-acknowledgement?child=${id}${planParam}`;
+      const planType = child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' : 'Dietary Management Plan';
+
+      await base44.integrations.Core.SendEmail({
+        to: child.parent_email,
+        subject: `Action Required: Please review and sign ${child.first_name}'s ${planType}`,
+        body: `Dear ${child.parent_name || 'Parent/Guardian'},\n\nPlease review and digitally sign the ${planType} for ${child.first_name} ${child.last_name}.\n\nClick the link below to view the plan and provide your acknowledgement:\n\n${ackUrl}\n\nIf you have any questions, please contact the service directly.\n\nKind regards,\nOSHC Service Team`,
+      });
+
+      // Log the communication
+      await base44.entities.CommunicationLog.create({
+        child_id: id,
+        date: new Date().toISOString().split('T')[0],
+        method: 'Email',
+        subject: `${planType} sent for acknowledgement`,
+        summary: `Plan emailed to ${child.parent_email} for digital signature.`,
+        sent_by: 'Staff',
+        response_required: 'Yes',
+        response_received: 'No',
+        follow_up_required: 'Yes',
+      });
+
+      // Mark plan as Sent if Draft
+      if (planRecord && planRecord.plan_status === 'Draft') {
+        await base44.entities.PlanTracking.update(planRecord.id, {
+          plan_status: 'Sent',
+          sent_date: new Date().toISOString().split('T')[0],
+        });
+      } else if (!planRecord) {
+        await base44.entities.PlanTracking.create({
+          child_id: id,
+          plan_type: child.condition_type || 'Allergy',
+          plan_status: 'Sent',
+          sent_date: new Date().toISOString().split('T')[0],
+          parent_signed: 'No',
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planTracking', id] });
+      queryClient.invalidateQueries({ queryKey: ['comms', id] });
+      toast.success(`Plan emailed to ${child.parent_email}`);
+    },
+    onError: (e) => toast.error(e.message || 'Failed to send email'),
   });
 
   const markSignedMutation = useMutation({
