@@ -136,14 +136,24 @@ export default function PrintPlan() {
           <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 mb-3">Parent / Guardian Acknowledgement</h2>
           <div className="px-3 text-sm space-y-4">
             <p>I acknowledge that I have read and understood this plan, and that the information provided is accurate.</p>
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-8 items-end">
               <div>
-                <p className="font-medium mb-8">Parent / Guardian Signature:</p>
-                <div className="border-b border-black"></div>
+                {parentSig ? (
+                  <div>
+                    <p className="font-medium mb-1">Parent / Guardian Signature:</p>
+                    <img src={parentSig} alt="Parent signature" className="h-16 border-b border-black w-full object-contain object-left" />
+                  </div>
+                ) : (
+                  <div className="no-print">
+                    <SignaturePad label="Parent / Guardian Signature:" onSave={setParentSig} />
+                  </div>
+                )}
+                {/* Print-only blank line if no sig */}
+                {!parentSig && <div className="print-only hidden print:block border-b border-black mt-10"></div>}
               </div>
               <div>
-                <p className="font-medium mb-8">Date:</p>
-                <div className="border-b border-black"></div>
+                <p className="font-medium mb-1">Date:</p>
+                <p className="border-b border-black pb-1">{parentSig ? parentSigDate : ''}</p>
               </div>
             </div>
           </div>
@@ -153,19 +163,24 @@ export default function PrintPlan() {
         <section>
           <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 mb-3">Staff Approval</h2>
           <div className="px-3 text-sm space-y-4">
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-8 items-end">
               <div>
-                <p className="font-medium mb-8">Staff Name & Signature:</p>
-                <div className="border-b border-black"></div>
+                {staffSig ? (
+                  <div>
+                    <p className="font-medium mb-1">Staff Name & Signature:</p>
+                    <img src={staffSig} alt="Staff signature" className="h-16 border-b border-black w-full object-contain object-left" />
+                  </div>
+                ) : (
+                  <div className="no-print">
+                    <SignaturePad label="Staff Name & Signature:" onSave={setStaffSig} />
+                  </div>
+                )}
+                {!staffSig && <div className="hidden print:block border-b border-black mt-10"></div>}
               </div>
               <div>
-                <p className="font-medium mb-8">Date:</p>
-                <div className="border-b border-black"></div>
+                <p className="font-medium mb-1">Date:</p>
+                <p className="border-b border-black pb-1">{staffSig ? parentSigDate : ''}</p>
               </div>
-            </div>
-            <div>
-              <p className="font-medium mb-8">Coordinator Approval:</p>
-              <div className="border-b border-black w-1/2"></div>
             </div>
           </div>
         </section>
