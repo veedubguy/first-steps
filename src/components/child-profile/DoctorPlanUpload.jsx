@@ -32,17 +32,21 @@ export default function DoctorPlanUpload({ child, onUpdated }) {
       setExtracting(true);
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are reviewing a medical action plan or doctor's letter for a child with food allergies or dietary requirements at an OSHC (Outside School Hours Care) service. 
+        prompt: `You are reviewing a medical action plan or doctor's letter for a child at an OSHC (Outside School Hours Care) service. The plan may be for food allergies, dietary requirements, or asthma.
 Extract the following information from this document:
-- allergens (comma-separated list of allergens, e.g. "Peanuts, Tree Nuts")
-- severity (one of: "Low", "Moderate", "Anaphylaxis")
-- trigger (what triggers the reaction, e.g. "Ingestion or contact with peanuts")
-- reaction (expected reaction, e.g. "Hives, vomiting, anaphylaxis")
+- condition_type (one of: "Allergy", "Dietary", "Asthma")
+- allergens (comma-separated list of allergens, e.g. "Peanuts, Tree Nuts" — only for allergy plans)
+- severity (one of: "Low", "Moderate", "Anaphylaxis" — only for allergy plans)
+- asthma_severity (one of: "Mild", "Moderate", "Severe" — only for asthma plans)
+- asthma_triggers (comma-separated triggers e.g. "Exercise, Cold air, Dust" — only for asthma plans)
+- reliever_medication (e.g. "Ventolin 2-4 puffs via spacer" — for asthma)
+- preventer_medication (e.g. "Flixotide 1 puff twice daily" — for asthma, or empty string)
+- trigger (what triggers the reaction for allergy — e.g. "Ingestion or contact with peanuts")
+- reaction (expected reaction for allergy — e.g. "Hives, vomiting, anaphylaxis")
 - control_measures (key steps to minimise risk)
-- medication_required (medication name and dose, e.g. "EpiPen 0.3mg" or empty string if none)
+- medication_required (medication name and dose for allergy e.g. "EpiPen 0.3mg" or empty string)
 - medication_location (where medication is stored, or empty string if none)
 - dietary_requirement (if dietary plan, e.g. "Halal, No Dairy", otherwise empty string)
-- condition_type (either "Allergy" or "Dietary")
 - notes (any other important notes from the plan)
 
 Return only the extracted data. If a field cannot be determined, use an empty string.`,
@@ -50,15 +54,19 @@ Return only the extracted data. If a field cannot be determined, use an empty st
         response_json_schema: {
           type: 'object',
           properties: {
+            condition_type: { type: 'string' },
             allergens: { type: 'string' },
             severity: { type: 'string' },
+            asthma_severity: { type: 'string' },
+            asthma_triggers: { type: 'string' },
+            reliever_medication: { type: 'string' },
+            preventer_medication: { type: 'string' },
             trigger: { type: 'string' },
             reaction: { type: 'string' },
             control_measures: { type: 'string' },
             medication_required: { type: 'string' },
             medication_location: { type: 'string' },
             dietary_requirement: { type: 'string' },
-            condition_type: { type: 'string' },
             notes: { type: 'string' },
           },
         },
@@ -76,10 +84,14 @@ Return only the extracted data. If a field cannot be determined, use an empty st
 
   const applyExtracted = async () => {
     const updates = {};
+    if (extracted.condition_type && ['Allergy', 'Dietary', 'Asthma'].includes(extracted.condition_type)) updates.condition_type = extracted.condition_type;
     if (extracted.allergens) updates.allergens = extracted.allergens;
     if (extracted.severity && ['Low', 'Moderate', 'Anaphylaxis'].includes(extracted.severity)) updates.severity = extracted.severity;
     if (extracted.dietary_requirement) updates.dietary_requirement = extracted.dietary_requirement;
-    if (extracted.condition_type && ['Allergy', 'Dietary'].includes(extracted.condition_type)) updates.condition_type = extracted.condition_type;
+    if (extracted.asthma_triggers) updates.asthma_triggers = extracted.asthma_triggers;
+    if (extracted.asthma_severity && ['Mild', 'Moderate', 'Severe'].includes(extracted.asthma_severity)) updates.asthma_severity = extracted.asthma_severity;
+    if (extracted.reliever_medication) updates.reliever_medication = extracted.reliever_medication;
+    if (extracted.preventer_medication) updates.preventer_medication = extracted.preventer_medication;
     if (extracted.notes) updates.notes = extracted.notes;
 
     await base44.entities.Children.update(child.id, updates);
