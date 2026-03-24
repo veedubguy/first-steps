@@ -9,7 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import AppLayout from '@/components/layout/AppLayout';
 import Dashboard from '@/pages/Dashboard';
 import ChildrenList from '@/pages/ChildrenList';
-import ChildForm from '@/pages/ChildForm';
+import ChildForm from '@/pages/ChildForm.jsx';
 import ChildProfile from '@/pages/ChildProfile';
 import RiskPlanForm from '@/pages/RiskPlanForm';
 import CommunicationForm from '@/pages/CommunicationForm';
