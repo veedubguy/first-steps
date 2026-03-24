@@ -35,23 +35,33 @@ export default function ParentAcknowledgement() {
 
   const signMutation = useMutation({
     mutationFn: async () => {
+      // Upload the signature image
+      let signatureUrl = null;
+      if (parentSig) {
+        const blob = await fetch(parentSig).then(r => r.blob());
+        const file = new File([blob], 'signature.png', { type: 'image/png' });
+        const result = await base44.integrations.Core.UploadFile({ file });
+        signatureUrl = result.file_url;
+      }
+
+      const sigData = {
+        plan_status: 'Signed',
+        parent_signed: 'Yes',
+        signed_date: new Date().toISOString().split('T')[0],
+        parent_signed_name: parentName,
+        ...(signatureUrl && { parent_signature_url: signatureUrl }),
+        notes: `Signed digitally by ${parentName}`,
+      };
+
       // Update plan tracking to Signed
       if (planTrackingId) {
-        await base44.entities.PlanTracking.update(planTrackingId, {
-          plan_status: 'Signed',
-          parent_signed: 'Yes',
-          signed_date: new Date().toISOString().split('T')[0],
-          notes: `Signed digitally by ${parentName}`,
-        });
+        await base44.entities.PlanTracking.update(planTrackingId, sigData);
       } else {
         // Create a new signed record
         await base44.entities.PlanTracking.create({
           child_id: childId,
           plan_type: child?.condition_type || 'Allergy',
-          plan_status: 'Signed',
-          parent_signed: 'Yes',
-          signed_date: new Date().toISOString().split('T')[0],
-          notes: `Signed digitally by ${parentName}`,
+          ...sigData,
         });
       }
       // Log the communication
