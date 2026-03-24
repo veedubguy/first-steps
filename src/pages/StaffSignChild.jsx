@@ -45,6 +45,11 @@ export default function StaffSignChild() {
   });
   const activePlans = riskPlans.filter(p => p.status !== 'Closed');
 
+  const { data: staffMembers = [], isLoading: ls } = useQuery({
+    queryKey: ['staffMembers'],
+    queryFn: () => base44.entities.StaffMember.filter({ active: true }),
+  });
+
   const submitMutation = useMutation({
     mutationFn: async () => {
       let sigUrl = null;
@@ -71,7 +76,7 @@ export default function StaffSignChild() {
   const canSubmit = form.staff_name.trim() && allChecked && sig;
 
   if (!childId) return <div className="min-h-screen flex items-center justify-center text-gray-500">Invalid link.</div>;
-  if (lc || lr) return <div className="min-h-screen flex items-center justify-center"><Skeleton className="w-80 h-60" /></div>;
+  if (lc || lr || ls) return <div className="min-h-screen flex items-center justify-center"><Skeleton className="w-80 h-60" /></div>;
   if (!child) return <div className="min-h-screen flex items-center justify-center text-gray-500">Child not found.</div>;
 
   const childName = `${child.first_name} ${child.last_name}`;
@@ -152,18 +157,28 @@ export default function StaffSignChild() {
           </div>
         )}
 
-        {/* Staff Details */}
+        {/* Staff Selection */}
         <div className="bg-white rounded-xl border p-5 space-y-4">
-          <h2 className="font-semibold text-gray-700">Your Details</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Full Name *</label>
-              <Input placeholder="e.g. Jane Smith" value={form.staff_name} onChange={e => setForm(f => ({ ...f, staff_name: e.target.value }))} />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Role</label>
-              <Input placeholder="e.g. Educator" value={form.staff_role} onChange={e => setForm(f => ({ ...f, staff_role: e.target.value }))} />
-            </div>
+          <h2 className="font-semibold text-gray-700">Select Your Name *</h2>
+          <div className="space-y-2">
+            {staffMembers.length === 0 ? (
+              <p className="text-sm text-gray-500">No staff members available</p>
+            ) : (
+              staffMembers.map(staff => (
+                <button
+                  key={staff.id}
+                  onClick={() => setForm(f => ({ ...f, staff_name: staff.full_name, staff_role: staff.role || '' }))}
+                  className={`w-full text-left p-3 rounded-lg border-2 transition-colors ${
+                    form.staff_name === staff.full_name
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="font-medium text-sm">{staff.full_name}</div>
+                  {staff.role && <div className="text-xs text-gray-500">{staff.role}</div>}
+                </button>
+              ))
+            )}
           </div>
         </div>
 
