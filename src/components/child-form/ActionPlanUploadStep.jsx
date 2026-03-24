@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Upload, FileText, Loader2, Sparkles, ArrowRight, X } from 'lucide-react';
+import { Upload, FileText, Loader2, Sparkles, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import heic2any from 'heic2any';
 
 export default function ActionPlanUploadStep({ onExtracted, onSkip }) {
   const [uploading, setUploading] = useState(false);
@@ -11,8 +12,20 @@ export default function ActionPlanUploadStep({ onExtracted, onSkip }) {
   const [uploadedFile, setUploadedFile] = useState(null); // { url, name }
 
   const handleFileChange = async (e) => {
-    const file = e.target.files[0];
+    let file = e.target.files[0];
     if (!file) return;
+
+    // Convert HEIC/HEIF to JPEG before uploading
+    if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+      try {
+        toast.info('Converting HEIC image...');
+        const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+        file = new File([blob], file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg'), { type: 'image/jpeg' });
+      } catch {
+        toast.error('Could not convert HEIC file');
+        return;
+      }
+    }
 
     setUploading(true);
     let file_url;
@@ -109,7 +122,7 @@ Return only extracted data. Use empty strings for fields not found.`,
 
       <Card className="p-6">
         <label className={`cursor-pointer block ${isLoading ? 'pointer-events-none' : ''}`}>
-          <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} disabled={isLoading} />
+          <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg,.heic,.heif" onChange={handleFileChange} disabled={isLoading} />
           <div className="border-2 border-dashed border-border rounded-xl p-10 text-center hover:border-primary hover:bg-primary/5 transition-colors">
             {isLoading ? (
               <div className="flex flex-col items-center gap-3">
