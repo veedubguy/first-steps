@@ -8,14 +8,9 @@ export default function SignaturePad({ onSave, existingSignature, label }) {
   const [hasContent, setHasContent] = useState(!!existingSignature);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
     if (existingSignature) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
       const img = new Image();
       img.onload = () => ctx.drawImage(img, 0, 0);
       img.src = existingSignature;
