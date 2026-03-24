@@ -193,6 +193,10 @@ Return only the extracted data. If a field cannot be determined, use an empty st
             {extracted.allergens && <div><span className="font-medium text-blue-700">Allergens:</span> {extracted.allergens}</div>}
             {extracted.severity && <div><span className="font-medium text-blue-700">Severity:</span> {extracted.severity}</div>}
             {extracted.dietary_requirement && <div><span className="font-medium text-blue-700">Dietary:</span> {extracted.dietary_requirement}</div>}
+            {extracted.asthma_triggers && <div className="sm:col-span-2"><span className="font-medium text-blue-700">Asthma Triggers:</span> {extracted.asthma_triggers}</div>}
+            {extracted.asthma_severity && <div><span className="font-medium text-blue-700">Asthma Severity:</span> {extracted.asthma_severity}</div>}
+            {extracted.reliever_medication && <div><span className="font-medium text-blue-700">Reliever:</span> {extracted.reliever_medication}</div>}
+            {extracted.preventer_medication && <div><span className="font-medium text-blue-700">Preventer:</span> {extracted.preventer_medication}</div>}
             {extracted.trigger && <div className="sm:col-span-2"><span className="font-medium text-blue-700">Trigger:</span> {extracted.trigger}</div>}
             {extracted.reaction && <div className="sm:col-span-2"><span className="font-medium text-blue-700">Reaction:</span> {extracted.reaction}</div>}
             {extracted.medication_required && <div><span className="font-medium text-blue-700">Medication:</span> {extracted.medication_required}</div>}
