@@ -28,6 +28,10 @@ export default function PrintPlan() {
     queryFn: () => base44.entities.PlanTracking.filter({ child_id: id }),
   });
 
+  const [parentSig, setParentSig] = useState(null);
+  const [staffSig, setStaffSig] = useState(null);
+  const [parentSigDate] = useState(format(new Date(), 'dd/MM/yyyy'));
+
   if (lc || lr) return <div className="p-8"><Skeleton className="h-96" /></div>;
   if (!child) return <div className="text-center py-12">Child not found</div>;
 
