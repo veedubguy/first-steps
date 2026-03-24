@@ -66,11 +66,10 @@ export default function StaffAcknowledgement() {
         signed_date: today,
       });
 
-      // Mark any matching pending request as Signed
+      // Mark any matching pending request as Signed (match by child_id since staff fills in their own name)
       const requests = await base44.entities.StaffSignoffRequest.filter({ child_id: childId, status: 'Pending' });
-      const match = requests.find(r => r.staff_name === form.staff_name || r.staff_email === form.staff_name);
-      if (match) {
-        await base44.entities.StaffSignoffRequest.update(match.id, { status: 'Signed', signed_date: today });
+      if (requests.length > 0) {
+        await base44.entities.StaffSignoffRequest.update(requests[0].id, { status: 'Signed', signed_date: today });
       }
     },
     onSuccess: () => setSubmitted(true),
