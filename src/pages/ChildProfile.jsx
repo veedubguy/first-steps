@@ -162,7 +162,7 @@ export default function ChildProfile() {
         <h1 className="text-xl font-bold">Child Profile</h1>
       </div>
 
-      <ChildHeader child={child} />
+      <ChildHeader child={child} onPhotoUpdated={() => queryClient.invalidateQueries({ queryKey: ['child', id] })} />
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2">

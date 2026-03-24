@@ -146,7 +146,11 @@ export default function PrintPlan() {
               <div><strong>Date of Plan Implemented:</strong> {planImplementedDate} &nbsp;&nbsp;&nbsp; <strong>Review Date:</strong> {planReviewDate}</div>
             </div>
           </div>
-          <div style={{ width: '72px', height: '72px', border: '1px solid #d1d5db', flexShrink: 0 }} />
+          {child.photo_url ? (
+            <img src={child.photo_url} alt={childName} style={{ width: '72px', height: '72px', objectFit: 'cover', border: '1px solid #d1d5db', flexShrink: 0 }} />
+          ) : (
+            <div style={{ width: '72px', height: '72px', border: '1px solid #d1d5db', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', color: '#9ca3af', textAlign: 'center' }}>Photo</div>
+          )}
         </div>
 
         {/* Medical Condition */}

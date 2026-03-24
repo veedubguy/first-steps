@@ -5,12 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Pencil, Phone, Mail } from 'lucide-react';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { format } from 'date-fns';
+import ChildPhotoUpload from '@/components/child-profile/ChildPhotoUpload';
 
-export default function ChildHeader({ child }) {
+export default function ChildHeader({ child, onPhotoUpdated }) {
   return (
     <Card className="p-5">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div className="space-y-2">
+        <div className="flex gap-4 items-start flex-1">
+          <ChildPhotoUpload child={child} onUpdated={onPhotoUpdated || (() => {})} />
+          <div className="space-y-2 flex-1">
           <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-xl font-bold">{child.first_name} {child.last_name}</h2>
             <StatusBadge type={child.condition_type} />
@@ -51,6 +54,7 @@ export default function ChildHeader({ child }) {
               )}
             </div>
           )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-2">
