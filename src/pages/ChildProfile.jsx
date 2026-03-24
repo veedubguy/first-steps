@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2, Mail, Link2 } from 'lucide-react';
+import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2, Mail, Link2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ChildHeader from '@/components/child-profile/ChildHeader';
@@ -10,6 +10,7 @@ import RiskPlansList from '@/components/child-profile/RiskPlansList';
 import CommunicationsList from '@/components/child-profile/CommunicationsList';
 import PlanTrackingList from '@/components/child-profile/PlanTrackingList';
 import DoctorPlanUpload from '@/components/child-profile/DoctorPlanUpload';
+import StaffSignoffsList from '@/components/child-profile/StaffSignoffsList';
 import { toast } from 'sonner';
 
 export default function ChildProfile() {
@@ -35,6 +36,11 @@ export default function ChildProfile() {
   const { data: planTracking = [], isLoading: loadingTracking } = useQuery({
     queryKey: ['planTracking', id],
     queryFn: () => base44.entities.PlanTracking.filter({ child_id: id }, '-created_date'),
+  });
+
+  const { data: staffSignoffs = [] } = useQuery({
+    queryKey: ['staffSignoffs', id],
+    queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, '-created_date'),
   });
 
   const markSentMutation = useMutation({
@@ -207,6 +213,16 @@ export default function ChildProfile() {
         >
           <Link2 className="w-3.5 h-3.5" /> Copy Parent Link
         </Button>
+        <Button
+          variant="outline" size="sm" className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
+          onClick={() => {
+            const url = `${window.location.origin}/staff-acknowledgement?child=${id}`;
+            navigator.clipboard.writeText(url);
+            toast.success('Staff link copied — send to your team');
+          }}
+        >
+          <Users className="w-3.5 h-3.5" /> Copy Staff Link
+        </Button>
         <Link to={`/children/${id}/print`}>
           <Button variant="outline" size="sm" className="gap-2">
             <Printer className="w-3.5 h-3.5" /> Print Plan
@@ -233,6 +249,12 @@ export default function ChildProfile() {
       <div>
         <h3 className="font-semibold text-sm mb-3">Risk Minimisation Plans ({riskPlans.length})</h3>
         <RiskPlansList plans={riskPlans} />
+      </div>
+
+      {/* Staff Sign-offs */}
+      <div>
+        <h3 className="font-semibold text-sm mb-3">Staff Sign-offs ({staffSignoffs.length})</h3>
+        <StaffSignoffsList signoffs={staffSignoffs} />
       </div>
 
       {/* Communications */}

@@ -48,6 +48,11 @@ export default function PrintPlan() {
     queryFn: () => base44.entities.PlanTracking.filter({ child_id: id }),
   });
 
+  const { data: staffSignoffs = [] } = useQuery({
+    queryKey: ['staffSignoffs', id],
+    queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, 'signed_date'),
+  });
+
   if (lc || lr) return <div className="p-8"><Skeleton className="h-96" /></div>;
   if (!child) return <div className="text-center py-12">Child not found</div>;
 
@@ -435,7 +440,24 @@ export default function PrintPlan() {
             </tr>
           </thead>
           <tbody>
-            {[...Array(10)].map((_, i) => (
+            {staffSignoffs.map(s => (
+              <tr key={s.id}>
+                <td style={{ ...TD, height: '22px' }}>
+                  <div>{s.staff_name}</div>
+                  {s.staff_role && <div style={{ fontSize: '9px', color: '#6b7280' }}>{s.staff_role}</div>}
+                </td>
+                <td style={{ ...TDC, color: s.check_medical_policy ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>{s.check_medical_policy ? '✓' : '✗'}</td>
+                <td style={{ ...TDC, color: s.check_condition_aware ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>{s.check_condition_aware ? '✓' : '✗'}</td>
+                <td style={{ ...TDC, color: s.check_med_plan_location ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>{s.check_med_plan_location ? '✓' : '✗'}</td>
+                <td style={{ ...TDC, color: s.check_risk_plan_location ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>{s.check_risk_plan_location ? '✓' : '✗'}</td>
+                <td style={{ ...TDC, color: s.check_medication_use ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>{s.check_medication_use ? '✓' : '✗'}</td>
+                <td style={TD}>
+                  {s.signature_url && <img src={s.signature_url} alt="sig" style={{ height: '20px', maxWidth: '80px', objectFit: 'contain' }} />}
+                  <div style={{ fontSize: '9px', color: '#6b7280' }}>{s.signed_date ? format(new Date(s.signed_date), 'dd/MM/yyyy') : ''}</div>
+                </td>
+              </tr>
+            ))}
+            {[...Array(Math.max(0, 10 - staffSignoffs.length))].map((_, i) => (
               <tr key={i}>
                 <td style={{ ...TD, height: '22px' }}></td>
                 <td style={TDC}></td>
