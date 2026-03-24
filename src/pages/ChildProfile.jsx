@@ -9,14 +9,12 @@ import ChildHeader from '@/components/child-profile/ChildHeader';
 import RiskPlansList from '@/components/child-profile/RiskPlansList';
 import CommunicationsList from '@/components/child-profile/CommunicationsList';
 import PlanTrackingList from '@/components/child-profile/PlanTrackingList';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export default function ChildProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-
   const { data: children = [], isLoading: loadingChild } = useQuery({
     queryKey: ['child', id],
     queryFn: () => base44.entities.Children.filter({ id }),
