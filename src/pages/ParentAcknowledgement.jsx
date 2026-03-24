@@ -210,6 +210,19 @@ export default function ParentAcknowledgement() {
               </span>
             </label>
 
+            <div>
+              {parentSig ? (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-1">Your Signature:</p>
+                  <img src={parentSig} alt="Signature" className="h-16 border-b border-gray-400 w-full object-contain object-left" />
+                  <p className="text-xs text-gray-500 mt-1">Signed: {signedDate}</p>
+                  <button type="button" onClick={() => setParentSig(null)} className="text-xs text-blue-600 underline mt-1">Clear signature</button>
+                </div>
+              ) : (
+                <SignaturePad label="Your Signature:" onSave={setParentSig} />
+              )}
+            </div>
+
             {error && (
               <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
                 <AlertCircle className="w-4 h-4 shrink-0" />
