@@ -20,6 +20,7 @@ import StaffList from '@/pages/StaffList';
 import CasualStaffBriefing from '@/pages/CasualStaffBriefing';
 import StaffSignoffDashboard from '@/pages/StaffSignoffDashboard';
 import StaffSignChild from '@/pages/StaffSignChild';
+import LeadEducatorStaffReview from '@/pages/LeadEducatorStaffReview';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -59,6 +60,7 @@ const AuthenticatedApp = () => {
       <Route path="/staff-acknowledgement" element={<StaffAcknowledgement />} />
       <Route path="/staff-signoff" element={<StaffSignoffDashboard />} />
       <Route path="/staff-sign-child/:childId" element={<StaffSignChild />} />
+      <Route path="/lead-educator-review" element={<LeadEducatorStaffReview />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
