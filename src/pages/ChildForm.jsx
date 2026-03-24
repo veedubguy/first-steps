@@ -201,7 +201,10 @@ export default function ChildForm() {
           <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} rows={3} placeholder="Any additional notes..." />
         </Card>
 
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center sticky bottom-0 bg-background border-t pt-4 pb-2 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+          <Button type="button" variant="outline" onClick={() => navigate(-1)} className="gap-2">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </Button>
           <Button type="submit" disabled={mutation.isPending} className="gap-2">
             {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {isEditing ? 'Update Child' : 'Save Child'}
