@@ -170,6 +170,15 @@ export default function ChildProfile() {
           </Button>
         </Link>
         <Button
+          variant="outline" size="sm" className="gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
+          onClick={() => sendToParentMutation.mutate()}
+          disabled={sendToParentMutation.isPending || !child?.parent_email}
+          title={!child?.parent_email ? 'No parent email on record' : ''}
+        >
+          {sendToParentMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
+          Send to Parent
+        </Button>
+        <Button
           variant="outline" size="sm" className="gap-2"
           onClick={() => markSentMutation.mutate()}
           disabled={markSentMutation.isPending || (!hasDraftOrNone)}
