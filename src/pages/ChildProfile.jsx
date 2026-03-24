@@ -160,9 +160,11 @@ export default function ChildProfile() {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2">
-        <Link to={`/children/${id}/risk-plan/new`}>
+        <Link to={riskPlans.length > 0
+          ? `/children/${id}/risk-plan/new?planId=${riskPlans[0].id}`
+          : `/children/${id}/risk-plan/new`}>
           <Button variant="outline" size="sm" className="gap-2">
-            <Plus className="w-3.5 h-3.5" /> Create Risk Plan
+            <Plus className="w-3.5 h-3.5" /> {riskPlans.length > 0 ? 'Edit Risk Plan' : 'Create Risk Plan'}
           </Button>
         </Link>
         <Link to={`/children/${id}/communication/new`}>

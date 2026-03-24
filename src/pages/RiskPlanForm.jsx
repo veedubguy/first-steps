@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,12 +9,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
 export default function RiskPlanForm() {
   const { id: childId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const editPlanId = urlParams.get('planId');
+
   const [form, setForm] = useState({
     child_id: childId,
     trigger: '',
@@ -28,14 +33,42 @@ export default function RiskPlanForm() {
     status: 'Active',
   });
 
+  const { data: existingPlans = [], isLoading: loadingExisting } = useQuery({
+    queryKey: ['riskPlan-edit', editPlanId],
+    queryFn: () => base44.entities.RiskPlans.filter({ id: editPlanId }),
+    enabled: !!editPlanId,
+  });
+
+  useEffect(() => {
+    if (existingPlans[0]) {
+      const p = existingPlans[0];
+      setForm({
+        child_id: childId,
+        trigger: p.trigger || '',
+        exposure_risk: p.exposure_risk || '',
+        reaction: p.reaction || '',
+        risk_level: p.risk_level || 'Medium',
+        control_measures: p.control_measures || '',
+        medication_required: p.medication_required || '',
+        medication_location: p.medication_location || '',
+        review_date: p.review_date || '',
+        status: p.status || 'Active',
+      });
+    }
+  }, [existingPlans]);
+
   const mutation = useMutation({
-    mutationFn: (data) => base44.entities.RiskPlans.create(data),
+    mutationFn: (data) => editPlanId
+      ? base44.entities.RiskPlans.update(editPlanId, data)
+      : base44.entities.RiskPlans.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['riskPlans', childId] });
-      toast.success('Risk plan created');
+      toast.success(editPlanId ? 'Risk plan updated' : 'Risk plan created');
       navigate(`/children/${childId}`);
     },
   });
+
+  if (loadingExisting) return <div className="p-8"><Skeleton className="h-96" /></div>;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,7 +83,7 @@ export default function RiskPlanForm() {
         <Button variant="ghost" size="icon" onClick={() => navigate(`/children/${childId}`)}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <h1 className="text-xl font-bold">Create Risk Plan</h1>
+        <h1 className="text-xl font-bold">{editPlanId ? 'Edit Risk Plan' : 'Create Risk Plan'}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -123,7 +156,7 @@ export default function RiskPlanForm() {
         <div className="flex justify-end">
           <Button type="submit" disabled={mutation.isPending} className="gap-2">
             {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save Risk Plan
+            {editPlanId ? 'Update Risk Plan' : 'Save Risk Plan'}
           </Button>
         </div>
       </form>
