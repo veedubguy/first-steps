@@ -49,7 +49,6 @@ const AuthenticatedApp = () => {
         <Route path="/children/:id/print" element={<PrintPlan />} />
       </Route>
       <Route path="/parent-acknowledgement" element={<ParentAcknowledgement />} />
-      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
