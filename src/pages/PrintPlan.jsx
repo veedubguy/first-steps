@@ -50,7 +50,7 @@ export default function PrintPlan() {
 
   const { data: staffSignoffs = [] } = useQuery({
     queryKey: ['staffSignoffs', id],
-    queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, 'signed_date'),
+    queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, '-signed_date'),
   });
 
   if (lc || lr) return <div className="p-8"><Skeleton className="h-96" /></div>;

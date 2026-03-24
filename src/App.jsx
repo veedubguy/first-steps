@@ -18,6 +18,8 @@ import ParentAcknowledgement from '@/pages/ParentAcknowledgement';
 import StaffAcknowledgement from '@/pages/StaffAcknowledgement';
 import StaffList from '@/pages/StaffList';
 import CasualStaffBriefing from '@/pages/CasualStaffBriefing';
+import StaffSignoffDashboard from '@/pages/StaffSignoffDashboard';
+import StaffSignChild from '@/pages/StaffSignChild';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +57,8 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/parent-acknowledgement" element={<ParentAcknowledgement />} />
       <Route path="/staff-acknowledgement" element={<StaffAcknowledgement />} />
+      <Route path="/staff-signoff" element={<StaffSignoffDashboard />} />
+      <Route path="/staff-sign-child/:childId" element={<StaffSignChild />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

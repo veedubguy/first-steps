@@ -45,7 +45,7 @@ export default function ChildProfile() {
     queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, '-created_date'),
   });
 
-  const [showSendStaff, setShowSendStaff] = useState(false);
+
 
   const markSentMutation = useMutation({
     mutationFn: () => {
@@ -217,12 +217,13 @@ export default function ChildProfile() {
         >
           <Link2 className="w-3.5 h-3.5" /> Copy Parent Link
         </Button>
-        <Button
-          variant="outline" size="sm" className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
-          onClick={() => setShowSendStaff(true)}
-        >
-          <Users className="w-3.5 h-3.5" /> Send to Staff
-        </Button>
+        <Link to="/staff-signoff">
+          <Button
+            variant="outline" size="sm" className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
+          >
+            <Users className="w-3.5 h-3.5" /> Staff Sign-Off (Tablet)
+          </Button>
+        </Link>
         <Link to={`/children/${id}/print`}>
           <Button variant="outline" size="sm" className="gap-2">
             <Printer className="w-3.5 h-3.5" /> Print Plan
@@ -257,9 +258,7 @@ export default function ChildProfile() {
         <StaffSignoffStatus childId={id} />
       </div>
 
-      {showSendStaff && (
-        <SendToStaffModal open={showSendStaff} onClose={() => setShowSendStaff(false)} child={child} />
-      )}
+
 
       {/* Communications */}
       <div>
