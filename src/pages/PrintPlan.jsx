@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// parentSig state removed — signature now loaded from saved PlanTracking record
 import { base44 } from '@/api/base44Client';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
