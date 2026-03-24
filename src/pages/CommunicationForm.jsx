@@ -15,8 +15,6 @@ export default function CommunicationForm() {
   const { id: childId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-
   const [form, setForm] = useState({
     child_id: childId,
     date: new Date().toISOString().split('T')[0],
