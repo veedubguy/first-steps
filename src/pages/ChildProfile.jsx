@@ -202,6 +202,15 @@ export default function ChildProfile() {
         </Link>
       </div>
 
+      {/* Doctor Plan Upload */}
+      <DoctorPlanUpload
+        child={child}
+        onUpdated={() => {
+          queryClient.invalidateQueries({ queryKey: ['child', id] });
+          queryClient.invalidateQueries({ queryKey: ['riskPlans', id] });
+        }}
+      />
+
       {/* Plan Status */}
       <div>
         <h3 className="font-semibold text-sm mb-3">Plan Tracking</h3>
