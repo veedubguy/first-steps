@@ -6,6 +6,7 @@ import { CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import SignaturePad from '@/components/shared/SignaturePad';
 
 export default function ParentAcknowledgement() {
@@ -19,6 +20,12 @@ export default function ParentAcknowledgement() {
   const [error, setError] = useState('');
   const [parentSig, setParentSig] = useState(null);
   const [signedDate] = useState(format(new Date(), 'dd/MM/yyyy'));
+  const [parentInput, setParentInput] = useState({
+    trigger: '',
+    exposure_risk: '',
+    reaction: '',
+    control_measures: '',
+  });
 
   const { data: children = [], isLoading: lc } = useQuery({
     queryKey: ['ack-child', childId],
@@ -64,6 +71,18 @@ export default function ParentAcknowledgement() {
           ...sigData,
         });
       }
+
+      // Update risk plans with parent input
+      if (activePlans.length > 0 && (parentInput.trigger || parentInput.exposure_risk || parentInput.reaction || parentInput.control_measures)) {
+        const plan = activePlans[0];
+        await base44.entities.RiskPlans.update(plan.id, {
+          trigger: parentInput.trigger || plan.trigger,
+          exposure_risk: parentInput.exposure_risk || plan.exposure_risk,
+          reaction: parentInput.reaction || plan.reaction,
+          control_measures: parentInput.control_measures || plan.control_measures,
+        });
+      }
+
       // Log the communication
       await base44.entities.CommunicationLog.create({
         child_id: childId,
@@ -132,17 +151,65 @@ export default function ParentAcknowledgement() {
 
   const activePlans = riskPlans.filter(p => p.status !== 'Closed');
 
+  const handleParentInputChange = (field, value) => {
+    setParentInput(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center">
+         {/* Header */}
+         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
             {child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' :
              child.condition_type === 'Asthma' ? 'Asthma Management Plan' : 'Dietary Management Plan'}
           </h1>
           <p className="text-gray-500 mt-1">Please review and acknowledge this plan for your child</p>
         </div>
+
+        {/* Parent Input Section */}
+        {activePlans.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-4">
+            <h2 className="font-bold text-gray-900">Please Complete These Details</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">What is the trigger? *</label>
+                <Input
+                  placeholder="e.g. Peanuts, dairy, exercise..."
+                  value={parentInput.trigger}
+                  onChange={e => handleParentInputChange('trigger', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">How might exposure occur?</label>
+                <Textarea
+                  placeholder="e.g. Through food contact, airborne particles..."
+                  value={parentInput.exposure_risk}
+                  onChange={e => handleParentInputChange('exposure_risk', e.target.value)}
+                  className="h-20"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">What is the expected reaction?</label>
+                <Textarea
+                  placeholder="e.g. Rash, swelling, difficulty breathing..."
+                  value={parentInput.reaction}
+                  onChange={e => handleParentInputChange('reaction', e.target.value)}
+                  className="h-20"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">What control measures should be in place?</label>
+                <Textarea
+                  placeholder="e.g. Avoid certain foods, have medication available..."
+                  value={parentInput.control_measures}
+                  onChange={e => handleParentInputChange('control_measures', e.target.value)}
+                  className="h-20"
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Plan Document */}
         <div className="bg-white border rounded-xl p-6 space-y-6 shadow-sm">
