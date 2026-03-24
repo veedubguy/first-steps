@@ -28,9 +28,13 @@ export default function PrintPlan() {
     queryFn: () => base44.entities.PlanTracking.filter({ child_id: id }),
   });
 
-  const [parentSig, setParentSig] = useState(null);
   const [staffSig, setStaffSig] = useState(null);
   const [parentSigDate] = useState(format(new Date(), 'dd/MM/yyyy'));
+
+  const signedRecord = planTracking.find(p => p.plan_status === 'Signed' && p.parent_signature_url);
+  const savedParentSig = signedRecord?.parent_signature_url || null;
+  const savedParentName = signedRecord?.parent_signed_name || null;
+  const savedSignedDate = signedRecord?.signed_date ? format(new Date(signedRecord.signed_date), 'dd/MM/yyyy') : null;
 
   if (lc || lr) return <div className="p-8"><Skeleton className="h-96" /></div>;
   if (!child) return <div className="text-center py-12">Child not found</div>;
