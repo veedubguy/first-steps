@@ -61,6 +61,11 @@ export default function Dashboard() {
            <p className="text-muted-foreground text-sm mt-1">Compliance overview at a glance</p>
          </div>
          <div className="flex gap-2">
+           <Link to="/staff-signoff">
+             <Button variant="outline" className="gap-2">
+               Staff Sign-Off
+             </Button>
+           </Link>
            <Link to="/lead-educator-review">
              <Button variant="outline" className="gap-2">
                Staff Review
