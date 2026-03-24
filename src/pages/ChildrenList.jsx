@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Plus, Search, ChevronRight } from 'lucide-react';
+import { Plus, Search, ChevronRight, Archive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -21,6 +21,7 @@ export default function ChildrenList() {
   });
 
   const filtered = children.filter(child => {
+    if (child.archived) return false;
     const matchesSearch = `${child.first_name} ${child.last_name}`.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'all' || child.condition_type === filterType;
     const matchesSeverity = filterSeverity === 'all' || child.severity === filterSeverity;
@@ -32,7 +33,7 @@ export default function ChildrenList() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Children</h1>
-          <p className="text-muted-foreground text-sm mt-1">{children.length} children enrolled</p>
+          <p className="text-muted-foreground text-sm mt-1">{filtered.length} of {children.length} enrolled</p>
         </div>
         <Link to="/children/new">
           <Button className="gap-2">

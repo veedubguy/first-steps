@@ -13,10 +13,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  const { data: children = [], isLoading: loadingChildren } = useQuery({
+  const { data: allChildren = [], isLoading: loadingChildren } = useQuery({
     queryKey: ['children'],
     queryFn: () => base44.entities.Children.list('-created_date'),
   });
+  const children = allChildren.filter(c => !c.archived);
 
   const { data: plans = [], isLoading: loadingPlans } = useQuery({
     queryKey: ['planTracking'],

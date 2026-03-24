@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2, Mail, Link2, Users } from 'lucide-react';
+import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2, Mail, Link2, Users, Archive, RotateCcw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ChildHeader from '@/components/child-profile/ChildHeader';
@@ -138,6 +138,33 @@ export default function ChildProfile() {
     },
   });
 
+  const archiveMutation = useMutation({
+    mutationFn: () => base44.entities.Children.update(id, { archived: true }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['child', id] });
+      queryClient.invalidateQueries({ queryKey: ['children'] });
+      toast.success('Child record archived');
+      navigate('/children');
+    },
+  });
+
+  const reactivateMutation = useMutation({
+    mutationFn: async () => {
+      await base44.entities.Children.update(id, { archived: false });
+      // Reset plan tracking for re-enrolment
+      const plans = await base44.entities.PlanTracking.filter({ child_id: id });
+      for (const plan of plans) {
+        await base44.entities.PlanTracking.update(plan.id, { plan_status: 'Draft', parent_signed: 'No' });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['child', id] });
+      queryClient.invalidateQueries({ queryKey: ['children'] });
+      queryClient.invalidateQueries({ queryKey: ['planTracking', id] });
+      toast.success('Child record reactivated');
+    },
+  });
+
   const isLoading = loadingChild || loadingPlans || loadingComms || loadingTracking;
 
   if (isLoading) {
@@ -159,6 +186,16 @@ export default function ChildProfile() {
 
   return (
     <div className="space-y-6">
+      {child?.archived && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-medium text-amber-900">This child record is archived</p>
+            <p className="text-sm text-amber-700 mt-1">The record is hidden from active lists. Click "Reactivate" below to bring the child back.</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={() => navigate('/children')}>
           <ArrowLeft className="w-4 h-4" />
@@ -265,6 +302,35 @@ export default function ChildProfile() {
         <h3 className="font-semibold text-sm mb-3">Communication Log ({comms.length})</h3>
         <CommunicationsList communications={comms} />
       </div>
-    </div>
-  );
-}
+
+      {/* Archive/Reactivate */}
+      <div className="border-t pt-6">
+        {child?.archived ? (
+          <Button
+            variant="outline"
+            className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
+            onClick={() => reactivateMutation.mutate()}
+            disabled={reactivateMutation.isPending}
+          >
+            {reactivateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+            Reactivate Child
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            className="gap-2 border-gray-300 text-gray-600 hover:bg-gray-50"
+            onClick={() => {
+              if (confirm(`Archive ${child.first_name} ${child.last_name}? This will remove them from active lists.`)) {
+                archiveMutation.mutate();
+              }
+            }}
+            disabled={archiveMutation.isPending}
+          >
+            {archiveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Archive className="w-4 h-4" />}
+            Archive Child
+          </Button>
+        )}
+      </div>
+      </div>
+      );
+      }
