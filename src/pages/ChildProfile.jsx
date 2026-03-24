@@ -11,6 +11,8 @@ import CommunicationsList from '@/components/child-profile/CommunicationsList';
 import PlanTrackingList from '@/components/child-profile/PlanTrackingList';
 import DoctorPlanUpload from '@/components/child-profile/DoctorPlanUpload';
 import StaffSignoffsList from '@/components/child-profile/StaffSignoffsList';
+import SendToStaffModal from '@/components/child-profile/SendToStaffModal';
+import StaffSignoffStatus from '@/components/child-profile/StaffSignoffStatus';
 import { toast } from 'sonner';
 
 export default function ChildProfile() {
@@ -42,6 +44,8 @@ export default function ChildProfile() {
     queryKey: ['staffSignoffs', id],
     queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, '-created_date'),
   });
+
+  const [showSendStaff, setShowSendStaff] = useState(false);
 
   const markSentMutation = useMutation({
     mutationFn: () => {
@@ -215,13 +219,9 @@ export default function ChildProfile() {
         </Button>
         <Button
           variant="outline" size="sm" className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
-          onClick={() => {
-            const url = `${window.location.origin}/staff-acknowledgement?child=${id}`;
-            navigator.clipboard.writeText(url);
-            toast.success('Staff link copied — send to your team');
-          }}
+          onClick={() => setShowSendStaff(true)}
         >
-          <Users className="w-3.5 h-3.5" /> Copy Staff Link
+          <Users className="w-3.5 h-3.5" /> Send to Staff
         </Button>
         <Link to={`/children/${id}/print`}>
           <Button variant="outline" size="sm" className="gap-2">
@@ -253,9 +253,13 @@ export default function ChildProfile() {
 
       {/* Staff Sign-offs */}
       <div>
-        <h3 className="font-semibold text-sm mb-3">Staff Sign-offs ({staffSignoffs.length})</h3>
-        <StaffSignoffsList signoffs={staffSignoffs} />
+        <h3 className="font-semibold text-sm mb-3">Staff Sign-offs</h3>
+        <StaffSignoffStatus childId={id} />
       </div>
+
+      {showSendStaff && (
+        <SendToStaffModal open={showSendStaff} onClose={() => setShowSendStaff(false)} child={child} />
+      )}
 
       {/* Communications */}
       <div>

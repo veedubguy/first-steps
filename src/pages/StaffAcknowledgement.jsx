@@ -56,12 +56,22 @@ export default function StaffAcknowledgement() {
         const res = await base44.integrations.Core.UploadFile({ file });
         sigUrl = res.file_url;
       }
+      const today = new Date().toISOString().split('T')[0];
+
+      // Create the signoff record
       await base44.entities.StaffSignoff.create({
         child_id: childId,
         ...form,
         signature_url: sigUrl,
-        signed_date: new Date().toISOString().split('T')[0],
+        signed_date: today,
       });
+
+      // Mark any matching pending request as Signed
+      const requests = await base44.entities.StaffSignoffRequest.filter({ child_id: childId, status: 'Pending' });
+      const match = requests.find(r => r.staff_name === form.staff_name || r.staff_email === form.staff_name);
+      if (match) {
+        await base44.entities.StaffSignoffRequest.update(match.id, { status: 'Signed', signed_date: today });
+      }
     },
     onSuccess: () => setSubmitted(true),
     onError: () => toast.error('Something went wrong. Please try again.'),

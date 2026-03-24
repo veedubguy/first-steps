@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Menu, X, Shield } from 'lucide-react';
+import { LayoutDashboard, Users, Menu, X, Shield, UserCog } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/children', label: 'Children', icon: Users },
+  { path: '/staff', label: 'Staff', icon: UserCog },
 ];
 
 export default function AppLayout() {

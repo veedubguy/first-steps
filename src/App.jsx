@@ -16,6 +16,7 @@ import CommunicationForm from '@/pages/CommunicationForm';
 import PrintPlan from '@/pages/PrintPlan';
 import ParentAcknowledgement from '@/pages/ParentAcknowledgement';
 import StaffAcknowledgement from '@/pages/StaffAcknowledgement';
+import StaffList from '@/pages/StaffList';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
         <Route path="/children/:id/risk-plan/new" element={<RiskPlanForm />} />
         <Route path="/children/:id/communication/new" element={<CommunicationForm />} />
         <Route path="/children/:id/print" element={<PrintPlan />} />
+        <Route path="/staff" element={<StaffList />} />
       </Route>
       <Route path="/parent-acknowledgement" element={<ParentAcknowledgement />} />
       <Route path="/staff-acknowledgement" element={<StaffAcknowledgement />} />
