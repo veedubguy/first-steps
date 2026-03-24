@@ -38,11 +38,19 @@ export default function SignaturePad({ onSave, existingSignature, label }) {
     };
   };
 
+  const getCtx = () => {
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    return ctx;
+  };
+
   const startDraw = (e) => {
     e.preventDefault();
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const pos = getPos(e, canvas);
+    const ctx = getCtx();
+    const pos = getPos(e, canvasRef.current);
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
     setDrawing(true);
@@ -51,9 +59,8 @@ export default function SignaturePad({ onSave, existingSignature, label }) {
   const draw = (e) => {
     e.preventDefault();
     if (!drawing) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const pos = getPos(e, canvas);
+    const ctx = getCtx();
+    const pos = getPos(e, canvasRef.current);
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
     setHasContent(true);
