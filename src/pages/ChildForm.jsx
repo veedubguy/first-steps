@@ -26,6 +26,10 @@ export default function ChildForm() {
     condition_type: 'Allergy',
     allergens: '',
     severity: 'Low',
+    asthma_triggers: '',
+    asthma_severity: 'Mild',
+    reliever_medication: '',
+    preventer_medication: '',
     dietary_requirement: '',
     parent_name: '',
     parent_email: '',
@@ -111,6 +115,7 @@ export default function ChildForm() {
               <SelectContent>
                 <SelectItem value="Allergy">Allergy</SelectItem>
                 <SelectItem value="Dietary">Dietary</SelectItem>
+                <SelectItem value="Asthma">Asthma</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -131,6 +136,34 @@ export default function ChildForm() {
                     <SelectItem value="Anaphylaxis">Anaphylaxis</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+          )}
+
+          {form.condition_type === 'Asthma' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Asthma Triggers</Label>
+                <Input value={form.asthma_triggers} onChange={e => update('asthma_triggers', e.target.value)} placeholder="e.g. Exercise, Cold air, Dust, Smoke" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Asthma Severity</Label>
+                <Select value={form.asthma_severity} onValueChange={v => update('asthma_severity', v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Mild">Mild</SelectItem>
+                    <SelectItem value="Moderate">Moderate</SelectItem>
+                    <SelectItem value="Severe">Severe</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Reliever Medication</Label>
+                <Input value={form.reliever_medication} onChange={e => update('reliever_medication', e.target.value)} placeholder="e.g. Ventolin 2-4 puffs via spacer" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Preventer Medication</Label>
+                <Input value={form.preventer_medication} onChange={e => update('preventer_medication', e.target.value)} placeholder="e.g. Flixotide 1 puff morning & night" />
               </div>
             </div>
           )}
