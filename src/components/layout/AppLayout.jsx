@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Menu, X, Shield, UserCog } from 'lucide-react';
+import { LayoutDashboard, Users, Menu, X, Shield, UserCog, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +8,7 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/children', label: 'Children', icon: Users },
   { path: '/staff', label: 'Staff', icon: UserCog },
+  { path: '/casual-staff-briefing', label: 'Staff Briefings', icon: BookOpen },
 ];
 
 export default function AppLayout() {

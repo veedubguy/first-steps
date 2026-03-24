@@ -2,14 +2,17 @@ import React from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Users, AlertTriangle, FileX, Clock, ChevronRight, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import StatCard from '@/components/shared/StatCard';
+import DashStatCard from '@/components/dashboard/StatCard';
+import KidsGrid from '@/components/dashboard/KidsGrid';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   const { data: children = [], isLoading: loadingChildren } = useQuery({
     queryKey: ['children'],
     queryFn: () => base44.entities.Children.list('-created_date'),
@@ -65,10 +68,41 @@ export default function Dashboard() {
        </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Children" value={children.length} icon={Users} accent="blue" />
-        <StatCard title="High Risk (Anaphylaxis)" value={highRiskChildren.length} icon={AlertTriangle} accent="red" />
-        <StatCard title="Plans Not Signed" value={unsignedPlans.length} icon={FileX} accent="amber" />
-        <StatCard title="Reviews Overdue" value={overdueReviews.length} icon={Clock} accent="green" />
+        <DashStatCard 
+          label="Total Children" 
+          value={children.length} 
+          icon={Users} 
+        />
+        <DashStatCard 
+          label="High Risk (Anaphylaxis)" 
+          value={highRiskChildren.length} 
+          icon={AlertTriangle}
+          variant="danger"
+          onClick={() => navigate('/children')}
+        />
+        <DashStatCard 
+          label="Plans Not Signed" 
+          value={unsignedPlans.length} 
+          icon={FileX}
+          variant="warning"
+          onClick={() => navigate('/children')}
+        />
+        <DashStatCard 
+          label="Reviews Overdue" 
+          value={overdueReviews.length} 
+          icon={Clock}
+          variant="warning"
+          onClick={() => navigate('/children')}
+        />
+      </div>
+
+      {/* Kids Grid */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">All Children</h2>
+          <Link to="/children" className="text-sm text-primary font-medium hover:underline">View list</Link>
+        </div>
+        <KidsGrid children={children} isLoading={isLoading} />
       </div>
 
       {/* High Risk Children */}
