@@ -60,12 +60,19 @@ export default function Dashboard() {
            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
            <p className="text-muted-foreground text-sm mt-1">Compliance overview at a glance</p>
          </div>
-         <Link to="/children/new">
-           <Button className="gap-2">
-             <Plus className="w-4 h-4" />
-             Add Child
-           </Button>
-         </Link>
+         <div className="flex gap-2">
+           <Link to="/lead-educator-review">
+             <Button variant="outline" className="gap-2">
+               Staff Review
+             </Button>
+           </Link>
+           <Link to="/children/new">
+             <Button className="gap-2">
+               <Plus className="w-4 h-4" />
+               Add Child
+             </Button>
+           </Link>
+         </div>
        </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
