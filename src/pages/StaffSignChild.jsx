@@ -7,6 +7,7 @@ import { ArrowLeft, CheckCircle2, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import SignaturePad from '@/components/shared/SignaturePad';
 import { toast } from 'sonner';
 
@@ -160,26 +161,21 @@ export default function StaffSignChild() {
         {/* Staff Selection */}
         <div className="bg-white rounded-xl border p-5 space-y-4">
           <h2 className="font-semibold text-gray-700">Select Your Name *</h2>
-          <div className="space-y-2">
-            {staffMembers.length === 0 ? (
-              <p className="text-sm text-gray-500">No staff members available</p>
-            ) : (
-              staffMembers.map(staff => (
-                <button
-                  key={staff.id}
-                  onClick={() => setForm(f => ({ ...f, staff_name: staff.full_name, staff_role: staff.role || '' }))}
-                  className={`w-full text-left p-3 rounded-lg border-2 transition-colors ${
-                    form.staff_name === staff.full_name
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="font-medium text-sm">{staff.full_name}</div>
-                  {staff.role && <div className="text-xs text-gray-500">{staff.role}</div>}
-                </button>
-              ))
-            )}
-          </div>
+          <Select value={form.staff_name} onValueChange={(value) => {
+            const staff = staffMembers.find(s => s.full_name === value);
+            setForm(f => ({ ...f, staff_name: value, staff_role: staff?.role || '' }));
+          }}>
+            <SelectTrigger>
+              <SelectValue placeholder="Choose your name" />
+            </SelectTrigger>
+            <SelectContent>
+              {staffMembers.map(staff => (
+                <SelectItem key={staff.id} value={staff.full_name}>
+                  {staff.full_name}{staff.role ? ` (${staff.role})` : ''}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Checkboxes */}
