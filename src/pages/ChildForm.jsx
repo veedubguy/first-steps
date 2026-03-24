@@ -52,7 +52,7 @@ export default function ChildForm() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['children'] });
-      toast({ title: isEditing ? 'Child updated' : 'Child added' });
+      toast.success(isEditing ? 'Child updated' : 'Child added');
       navigate(isEditing ? `/children/${id}` : `/children/${result.id}`);
     },
   });

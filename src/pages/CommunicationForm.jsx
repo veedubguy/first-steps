@@ -32,7 +32,7 @@ export default function CommunicationForm() {
     mutationFn: (data) => base44.entities.CommunicationLog.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comms', childId] });
-      toast({ title: 'Communication logged' });
+      toast.success('Communication logged');
       navigate(`/children/${childId}`);
     },
   });

@@ -55,7 +55,7 @@ export default function ChildProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planTracking', id] });
-      toast({ title: 'Plan marked as sent' });
+      toast.success('Plan marked as sent');
     },
   });
 
@@ -72,7 +72,7 @@ export default function ChildProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planTracking', id] });
-      toast({ title: 'Plan marked as signed' });
+      toast.success('Plan marked as signed');
     },
   });
 

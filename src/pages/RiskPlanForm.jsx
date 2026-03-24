@@ -32,7 +32,7 @@ export default function RiskPlanForm() {
     mutationFn: (data) => base44.entities.RiskPlans.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['riskPlans', childId] });
-      toast({ title: 'Risk plan created' });
+      toast.success('Risk plan created');
       navigate(`/children/${childId}`);
     },
   });
