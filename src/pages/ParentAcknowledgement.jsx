@@ -17,6 +17,8 @@ export default function ParentAcknowledgement() {
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [parentSig, setParentSig] = useState(null);
+  const [signedDate] = useState(format(new Date(), 'dd/MM/yyyy'));
 
   const { data: children = [], isLoading: lc } = useQuery({
     queryKey: ['ack-child', childId],
