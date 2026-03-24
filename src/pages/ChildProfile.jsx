@@ -9,6 +9,7 @@ import ChildHeader from '@/components/child-profile/ChildHeader';
 import RiskPlansList from '@/components/child-profile/RiskPlansList';
 import CommunicationsList from '@/components/child-profile/CommunicationsList';
 import PlanTrackingList from '@/components/child-profile/PlanTrackingList';
+import DoctorPlanUpload from '@/components/child-profile/DoctorPlanUpload';
 import { toast } from 'sonner';
 
 export default function ChildProfile() {
