@@ -2,7 +2,7 @@ import React from 'react';
 import { base44 } from '@/api/base44Client';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { ArrowLeft, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
@@ -40,8 +40,15 @@ export default function PrintPlan() {
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <h1 className="text-xl font-bold flex-1">Print Plan</h1>
+        <Button variant="outline" onClick={() => {
+          const url = `${window.location.origin}/parent-acknowledgement?child=${id}`;
+          navigator.clipboard.writeText(url);
+          alert('Parent acknowledgement link copied to clipboard!');
+        }} className="gap-2">
+          <Download className="w-4 h-4" /> Copy Parent Link
+        </Button>
         <Button onClick={() => window.print()} className="gap-2">
-          <Printer className="w-4 h-4" /> Print
+          <Printer className="w-4 h-4" /> Print / Save PDF
         </Button>
       </div>
 
