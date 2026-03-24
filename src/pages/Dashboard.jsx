@@ -1,9 +1,10 @@
 import React from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Users, AlertTriangle, FileX, Clock, ChevronRight } from 'lucide-react';
+import { Users, AlertTriangle, FileX, Clock, ChevronRight, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import StatCard from '@/components/shared/StatCard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,10 +51,18 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-1">Compliance overview at a glance</p>
-      </div>
+      <div className="flex items-center justify-between">
+         <div>
+           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+           <p className="text-muted-foreground text-sm mt-1">Compliance overview at a glance</p>
+         </div>
+         <Link to="/children/new">
+           <Button className="gap-2">
+             <Plus className="w-4 h-4" />
+             Add Child
+           </Button>
+         </Link>
+       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Total Children" value={children.length} icon={Users} accent="blue" />
