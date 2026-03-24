@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Plus, Search, ChevronRight, Archive } from 'lucide-react';
+import { Plus, Search, ChevronRight, Archive, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -14,6 +14,7 @@ export default function ChildrenList() {
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterSeverity, setFilterSeverity] = useState('all');
+  const [showArchived, setShowArchived] = useState(false);
 
   const { data: children = [], isLoading } = useQuery({
     queryKey: ['children'],
@@ -21,7 +22,8 @@ export default function ChildrenList() {
   });
 
   const filtered = children.filter(child => {
-    if (child.archived) return false;
+    if (showArchived && !child.archived) return false;
+    if (!showArchived && child.archived) return false;
     const matchesSearch = `${child.first_name} ${child.last_name}`.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'all' || child.condition_type === filterType;
     const matchesSeverity = filterSeverity === 'all' || child.severity === filterSeverity;
@@ -54,6 +56,15 @@ export default function ChildrenList() {
             className="pl-9"
           />
         </div>
+        <Button
+          variant={showArchived ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setShowArchived(!showArchived)}
+          className="gap-2 shrink-0"
+        >
+          {showArchived ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          {showArchived ? 'Archived' : 'Active'}
+        </Button>
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder="Condition" />
