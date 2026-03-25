@@ -20,10 +20,17 @@ export default function PrintStyles() {
         .no-print { display: none !important; }
         .print-page {
           width: 100%;
+          box-sizing: border-box;
+          break-after: page;
           page-break-after: always;
-          page-break-inside: avoid;
+          border: none !important;
+          border-radius: 0 !important;
+          margin-bottom: 0 !important;
         }
-        .print-page:last-child { page-break-after: auto; }
+        .print-page:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
         table { border-collapse: collapse; }
         th, td { border: 1px solid #6b7280 !important; }
       }
