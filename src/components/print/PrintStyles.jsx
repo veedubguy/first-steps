@@ -7,8 +7,8 @@ export default function PrintStyles() {
     style.id = 'a4-print-styles';
     style.innerHTML = `
       @page {
-        size: A4 portrait;
-        margin: 12mm 14mm 12mm 14mm;
+        size: A4 landscape;
+        margin: 10mm 12mm 10mm 12mm;
       }
       @media print {
         html, body {

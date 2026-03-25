@@ -131,7 +131,7 @@ export default function PrintPlan() {
             <!DOCTYPE html><html><head>
             <title>Print Plan – ${childName}</title>
             <style>
-              @page { size: A4 portrait; margin: 12mm 14mm; }
+              @page { size: A4 landscape; margin: 10mm 12mm; }
               * { box-sizing: border-box; }
               body { font-family: Arial, sans-serif; font-size: 10px; line-height: 1.35; background: white; color: #111; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
               .print-page { width: 100%; padding: 20px 24px; page-break-after: always; break-after: page; }
