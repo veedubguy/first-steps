@@ -124,11 +124,36 @@ export default function PrintPlan() {
         }} className="gap-2">
           <Link2 className="w-4 h-4" /> Copy Parent Link
         </Button>
-        <Button onClick={() => window.print()} className="gap-2">
+        <Button onClick={() => {
+          const printContent = document.getElementById('print-content');
+          const win = window.open('', '_blank', 'width=900,height=700');
+          win.document.write(`
+            <!DOCTYPE html><html><head>
+            <title>Print Plan – ${childName}</title>
+            <style>
+              @page { size: A4 portrait; margin: 12mm 14mm; }
+              * { box-sizing: border-box; }
+              body { font-family: Arial, sans-serif; font-size: 10px; line-height: 1.35; background: white; color: #111; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .print-page { width: 100%; padding: 20px 24px; page-break-after: always; break-after: page; }
+              .print-page:last-child { page-break-after: auto; break-after: auto; }
+              table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
+              th, td { border: 1px solid #6b7280; padding: 5px 6px; font-size: 10px; vertical-align: top; }
+              th { background: #f3f4f6; font-weight: bold; text-align: left; }
+              img { max-width: 100%; }
+            </style>
+            </head><body>
+            ${printContent.innerHTML}
+            </body></html>
+          `);
+          win.document.close();
+          win.focus();
+          setTimeout(() => { win.print(); win.close(); }, 500);
+        }} className="gap-2">
           <Printer className="w-4 h-4" /> Print / Save PDF
         </Button>
       </div>
 
+      <div id="print-content">
       {/* ══════════════════════════════════════════════════════════
           PAGE 1 — RISK MINIMISATION PLAN (main body)
       ══════════════════════════════════════════════════════════ */}
@@ -505,6 +530,7 @@ export default function PrintPlan() {
         </table>
 
         <Footer />
+      </div>
       </div>
     </div>
   );
