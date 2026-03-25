@@ -20,6 +20,8 @@ export default function ParentAcknowledgement() {
   const [error, setError] = useState('');
   const [parentSig, setParentSig] = useState(null);
   const [signedDate] = useState(format(new Date(), 'dd/MM/yyyy'));
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [parentInput, setParentInput] = useState({
     trigger: '',
     exposure_risk: '',
@@ -40,6 +42,13 @@ export default function ParentAcknowledgement() {
     enabled: !!childId,
   });
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
   const signMutation = useMutation({
     mutationFn: async () => {
       // Upload the signature image
@@ -49,6 +58,12 @@ export default function ParentAcknowledgement() {
         const file = new File([blob], 'signature.png', { type: 'image/png' });
         const result = await base44.integrations.Core.UploadFile({ file });
         signatureUrl = result.file_url;
+      }
+
+      // Upload the child photo if provided
+      if (photoFile) {
+        const photoResult = await base44.integrations.Core.UploadFile({ file: photoFile });
+        await base44.entities.Children.update(childId, { photo_url: photoResult.file_url });
       }
 
       const sigData = {
@@ -287,6 +302,28 @@ export default function ParentAcknowledgement() {
                 I, <strong>{parentName || 'the parent/guardian'}</strong>, acknowledge that I have read and understood this plan, agree to the information provided, and authorise the OSHC service to act in accordance with this plan.
               </span>
             </label>
+
+            {/* Photo Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Child's Photo <span className="text-gray-400 font-normal">(optional — used for identification on the care plan)</span>
+              </label>
+              {photoPreview ? (
+                <div className="flex items-center gap-4">
+                  <img src={photoPreview} alt="Child" className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+                  <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); }} className="text-xs text-blue-600 underline">
+                    Remove photo
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 transition-colors"
+                  onClick={() => document.getElementById('parent-photo-upload').click()}>
+                  <p className="text-sm text-gray-500">Tap to upload a photo of your child</p>
+                  <p className="text-xs text-gray-400 mt-1">JPG, PNG accepted</p>
+                  <input id="parent-photo-upload" type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+                </div>
+              )}
+            </div>
 
             <div>
               {parentSig ? (
