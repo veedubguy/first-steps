@@ -21,6 +21,8 @@ import CasualStaffBriefing from '@/pages/CasualStaffBriefing';
 import StaffSignoffDashboard from '@/pages/StaffSignoffDashboard';
 import StaffSignChild from '@/pages/StaffSignChild';
 import LeadEducatorStaffReview from '@/pages/LeadEducatorStaffReview';
+import CentreCommPlan from '@/pages/CentreCommPlan';
+import ParentCommPlan from '@/pages/ParentCommPlan';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -52,11 +54,13 @@ const AuthenticatedApp = () => {
         <Route path="/children/:id/edit" element={<ChildForm />} />
         <Route path="/children/:id/risk-plan/new" element={<RiskPlanForm />} />
         <Route path="/children/:id/communication/new" element={<CommunicationForm />} />
+        <Route path="/children/:id/comm-plan" element={<CentreCommPlan />} />
         <Route path="/children/:id/print" element={<PrintPlan />} />
         <Route path="/staff" element={<StaffList />} />
         <Route path="/casual-staff-briefing" element={<CasualStaffBriefing />} />
       </Route>
       <Route path="/parent-acknowledgement" element={<ParentAcknowledgement />} />
+      <Route path="/parent-comm-plan" element={<ParentCommPlan />} />
       <Route path="/staff-acknowledgement" element={<StaffAcknowledgement />} />
       <Route path="/staff-signoff" element={<StaffSignoffDashboard />} />
       <Route path="/staff-sign-child/:childId" element={<StaffSignChild />} />

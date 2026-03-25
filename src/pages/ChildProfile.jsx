@@ -13,6 +13,7 @@ import DoctorPlanUpload from '@/components/child-profile/DoctorPlanUpload';
 import StaffSignoffsList from '@/components/child-profile/StaffSignoffsList';
 import SendToStaffModal from '@/components/child-profile/SendToStaffModal';
 import StaffSignoffStatus from '@/components/child-profile/StaffSignoffStatus';
+import WorkflowTracker from '@/components/child-profile/WorkflowTracker';
 import { toast } from 'sonner';
 
 export default function ChildProfile() {
@@ -44,6 +45,12 @@ export default function ChildProfile() {
     queryKey: ['staffSignoffs', id],
     queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, '-created_date'),
   });
+
+  const { data: commPlans = [] } = useQuery({
+    queryKey: ['commPlan', id],
+    queryFn: () => base44.entities.CommunicationPlan.filter({ child_id: id }),
+  });
+  const commPlan = commPlans[0];
 
 
 
@@ -205,6 +212,12 @@ export default function ChildProfile() {
 
       <ChildHeader child={child} onPhotoUpdated={() => queryClient.invalidateQueries({ queryKey: ['child', id] })} />
 
+      {/* Workflow Progress Tracker */}
+      <div className="bg-white border rounded-xl p-4">
+        <h3 className="font-semibold text-sm mb-3 text-muted-foreground uppercase tracking-wide">Compliance Workflow</h3>
+        <WorkflowTracker planTracking={planTracking} commPlan={commPlan} />
+      </div>
+
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2">
         <Link to={riskPlans.length > 0
@@ -254,6 +267,14 @@ export default function ChildProfile() {
         >
           <Link2 className="w-3.5 h-3.5" /> Copy Parent Link
         </Button>
+        <Link to={`/children/${id}/comm-plan`}>
+          <Button
+            variant="outline" size="sm" className="gap-2 border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+          >
+            <CheckCircle className="w-3.5 h-3.5" />
+            {commPlan?.status === 'Complete' ? 'Comm Plan ✓' : commPlan?.status === 'Comm Pack Sent' ? 'Awaiting Parent Sign' : 'Stage 2: Comm Plan'}
+          </Button>
+        </Link>
         <Link to="/staff-signoff">
           <Button
             variant="outline" size="sm" className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
