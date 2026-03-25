@@ -53,6 +53,11 @@ export default function PrintPlan() {
     queryFn: () => base44.entities.StaffSignoff.filter({ child_id: id }, '-signed_date'),
   });
 
+  const { data: commLogs = [] } = useQuery({
+    queryKey: ['commLogs', id],
+    queryFn: () => base44.entities.CommunicationLog.filter({ child_id: id }, 'date'),
+  });
+
   if (lc || lr) return <div className="p-8"><Skeleton className="h-96" /></div>;
   if (!child) return <div className="text-center py-12">Child not found</div>;
 
@@ -521,6 +526,84 @@ export default function PrintPlan() {
             ))}
           </tbody>
         </table>
+
+        <Footer />
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════
+          PAGE 5 — COMMUNICATION LOG / AUDIT TRAIL
+      ══════════════════════════════════════════════════════════ */}
+      <div className="print-page" style={{ ...PAGE, padding: '20px 24px', border: '1px solid #e5e7eb', borderRadius: '6px' }}>
+        <div className="no-print" style={{ fontSize: '10px', color: '#9ca3af', marginBottom: '6px' }}>Page 5 — Communication Log / Audit Trail</div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+          <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1d4ed8', margin: 0 }}>Communication Log — Audit Trail</h1>
+          <div style={{ fontSize: '10px', color: '#6b7280', textAlign: 'right' }}>
+            <div><strong>Child:</strong> {childName}</div>
+            <div><strong>Printed:</strong> {today}</div>
+          </div>
+        </div>
+
+        <div style={SEC_HDR}>All Communications — Timeline Record &nbsp;·&nbsp; Child: {childName}</div>
+
+        {commLogs.length === 0 ? (
+          <div style={{ padding: '20px', textAlign: 'center', color: '#9ca3af', fontSize: '10px', border: '1px solid #e5e7eb' }}>
+            No communication records found for this child.
+          </div>
+        ) : (
+          <table style={TABLE}>
+            <thead>
+              <tr>
+                <th style={{ ...TH, width: '10%' }}>Date</th>
+                <th style={{ ...TH, width: '9%' }}>Method</th>
+                <th style={{ ...TH, width: '22%' }}>Subject</th>
+                <th style={{ ...TH, width: '30%' }}>Summary / Details</th>
+                <th style={{ ...TH, width: '12%' }}>Sent By</th>
+                <th style={{ ...TH, width: '8%', textAlign: 'center' }}>Response Req.</th>
+                <th style={{ ...TH, width: '9%', textAlign: 'center' }}>Response Rec.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {commLogs.map((log, i) => (
+                <tr key={log.id} style={{ background: i % 2 === 0 ? '#ffffff' : '#f9fafb' }}>
+                  <td style={{ ...TD, whiteSpace: 'nowrap' }}>
+                    {log.date ? format(new Date(log.date), 'dd/MM/yyyy') : '—'}
+                  </td>
+                  <td style={TD}>
+                    <span style={{
+                      display: 'inline-block', padding: '1px 5px', borderRadius: '3px', fontSize: '9px', fontWeight: 'bold',
+                      background: log.method === 'Email' ? '#dbeafe' : log.method === 'Phone' ? '#dcfce7' : '#fef9c3',
+                      color: log.method === 'Email' ? '#1e40af' : log.method === 'Phone' ? '#166534' : '#854d0e',
+                    }}>{log.method}</span>
+                  </td>
+                  <td style={{ ...TD, fontWeight: '500' }}>{log.subject || ''}</td>
+                  <td style={TD}>{log.summary || ''}</td>
+                  <td style={TD}>{log.sent_by || ''}</td>
+                  <td style={{ ...TDC, fontWeight: 'bold', color: log.response_required === 'Yes' ? '#dc2626' : '#6b7280' }}>
+                    {log.response_required || '—'}
+                  </td>
+                  <td style={{ ...TDC, fontWeight: 'bold', color: log.response_received === 'Yes' ? '#16a34a' : log.response_received === 'No' ? '#dc2626' : '#6b7280' }}>
+                    {log.response_received || '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {commLogs.length > 0 && (
+          <div style={{ marginTop: '10px', padding: '6px 8px', background: '#f3f4f6', border: '1px solid #e5e7eb', fontSize: '9px', color: '#6b7280' }}>
+            <strong>Summary:</strong> {commLogs.length} communication record{commLogs.length !== 1 ? 's' : ''} on file &nbsp;·&nbsp;
+            Emails: {commLogs.filter(l => l.method === 'Email').length} &nbsp;·&nbsp;
+            Phone calls: {commLogs.filter(l => l.method === 'Phone').length} &nbsp;·&nbsp;
+            Meetings: {commLogs.filter(l => l.method === 'Meeting').length} &nbsp;·&nbsp;
+            Responses pending: {commLogs.filter(l => l.response_required === 'Yes' && l.response_received !== 'Yes').length}
+          </div>
+        )}
+
+        <div style={{ marginTop: '16px', padding: '8px', border: '1px solid #d1d5db', fontSize: '9px', color: '#6b7280', lineHeight: '1.6' }}>
+          <strong>Audit Trail Declaration:</strong> This communication log represents a complete record of all documented interactions between the centre and family/guardians regarding {childName}'s medical management plan. All entries were recorded at the time of communication by centre staff. This document forms part of the child's medical management file in accordance with ACECQA regulatory requirements.
+        </div>
 
         <Footer />
       </div>
