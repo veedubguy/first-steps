@@ -316,6 +316,35 @@ export default function ChildForm() {
           </div>
         </Card>
 
+        {!isEditing && form.condition_type !== 'Dietary' && (
+          <Card className="p-5 space-y-4">
+            <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Risk Plan (optional)</h2>
+            <p className="text-xs text-muted-foreground">You can add this now or complete it from the child's profile later.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Trigger</Label>
+                <Input value={form.trigger} onChange={e => update('trigger', e.target.value)} placeholder="e.g. Peanuts, exercise, cold air" />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Reaction</Label>
+                <Textarea value={form.reaction} onChange={e => update('reaction', e.target.value)} rows={2} placeholder="Expected reaction description" />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Control Measures</Label>
+                <Textarea value={form.control_measures} onChange={e => update('control_measures', e.target.value)} rows={2} placeholder="Steps to minimise risk" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Medication Required</Label>
+                <Input value={form.medication_required} onChange={e => update('medication_required', e.target.value)} placeholder="e.g. EpiPen, Ventolin" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Medication Location</Label>
+                <Input value={form.medication_location} onChange={e => update('medication_location', e.target.value)} placeholder="e.g. Office first aid cabinet" />
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Card className="p-5 space-y-4">
           <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Notes</h2>
           <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} rows={3} placeholder="Any additional notes..." />

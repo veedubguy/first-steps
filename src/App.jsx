@@ -23,6 +23,7 @@ import StaffSignChild from '@/pages/StaffSignChild';
 import LeadEducatorStaffReview from '@/pages/LeadEducatorStaffReview';
 import CentreCommPlan from '@/pages/CentreCommPlan';
 import ParentCommPlan from '@/pages/ParentCommPlan';
+import ParentDietaryForm from '@/pages/ParentDietaryForm';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -61,6 +62,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/parent-acknowledgement" element={<ParentAcknowledgement />} />
       <Route path="/parent-comm-plan" element={<ParentCommPlan />} />
+      <Route path="/parent-dietary-form" element={<ParentDietaryForm />} />
       <Route path="/staff-acknowledgement" element={<StaffAcknowledgement />} />
       <Route path="/staff-signoff" element={<StaffSignoffDashboard />} />
       <Route path="/staff-sign-child/:childId" element={<StaffSignChild />} />

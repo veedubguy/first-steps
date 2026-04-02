@@ -14,6 +14,7 @@ import StaffSignoffsList from '@/components/child-profile/StaffSignoffsList';
 import SendToStaffModal from '@/components/child-profile/SendToStaffModal';
 import StaffSignoffStatus from '@/components/child-profile/StaffSignoffStatus';
 import WorkflowTracker from '@/components/child-profile/WorkflowTracker';
+import DietaryIntakeView from '@/components/child-profile/DietaryIntakeView';
 import { toast } from 'sonner';
 
 export default function ChildProfile() {
@@ -80,10 +81,33 @@ export default function ChildProfile() {
   const sendToParentMutation = useMutation({
     mutationFn: async () => {
       if (!child?.parent_email) throw new Error('No parent email on record');
+
+      // Dietary children get a different form
+      if (child.condition_type === 'Dietary') {
+        const dietaryUrl = `${window.location.origin}/parent-dietary-form?child=${id}`;
+        await base44.integrations.Core.SendEmail({
+          to: child.parent_email,
+          subject: `Action Required: Please complete ${child.first_name}'s Dietary Requirement Form`,
+          body: `Dear ${child.parent_name || 'Parent/Guardian'},\n\nTo ensure we can safely accommodate ${child.first_name} ${child.last_name}'s dietary needs at our service, we ask that you complete the dietary requirement form below.\n\nThis form covers dietary requirements, religious needs, foods to avoid, cross-contamination concerns, and meal arrangements.\n\nPlease complete the form here:\n\n${dietaryUrl}\n\nIf you have any questions, please contact us directly.\n\nKind regards,\nFirst Steps Before & After School Care`,
+        });
+        await base44.entities.CommunicationLog.create({
+          child_id: id,
+          date: new Date().toISOString().split('T')[0],
+          method: 'Email',
+          subject: 'Dietary Requirement Form sent to parent',
+          summary: `Dietary intake form emailed to ${child.parent_email}.`,
+          sent_by: 'Staff',
+          response_required: 'Yes',
+          response_received: 'No',
+          follow_up_required: 'Yes',
+        });
+        return;
+      }
+
       const planRecord = planTracking.find(p => p.plan_status === 'Draft') || planTracking[0];
       const planParam = planRecord ? `&plan=${planRecord.id}` : '';
       const ackUrl = `${window.location.origin}/parent-acknowledgement?child=${id}${planParam}`;
-      const planType = child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' : 'Dietary Management Plan';
+      const planType = child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' : 'Asthma Management Plan';
 
       await base44.integrations.Core.SendEmail({
         to: child.parent_email,
@@ -239,7 +263,7 @@ export default function ChildProfile() {
           title={!child?.parent_email ? 'No parent email on record' : ''}
         >
           {sendToParentMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
-          Send to Parent
+          {child?.condition_type === 'Dietary' ? 'Send Dietary Form to Parent' : 'Send to Parent'}
         </Button>
         <Button
           variant="outline" size="sm" className="gap-2"
@@ -288,6 +312,14 @@ export default function ChildProfile() {
           </Button>
         </Link>
       </div>
+
+      {/* Dietary Intake — only for Dietary children */}
+      {child?.condition_type === 'Dietary' && (
+        <div>
+          <h3 className="font-semibold text-sm mb-3">Dietary Intake (Parent Submitted)</h3>
+          <DietaryIntakeView childId={id} />
+        </div>
+      )}
 
       {/* Doctor Plan Upload */}
       <DoctorPlanUpload

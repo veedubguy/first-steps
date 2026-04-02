@@ -182,8 +182,8 @@ export default function ParentAcknowledgement() {
           <p className="text-gray-500 mt-1">Please review and acknowledge this plan for your child</p>
         </div>
 
-        {/* Parent Input Section */}
-        {activePlans.length > 0 && (
+        {/* Parent Input Section — not shown for Dietary (they have their own form) */}
+        {activePlans.length > 0 && child.condition_type !== 'Dietary' && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-4">
             <h2 className="font-bold text-gray-900">Please Complete These Details</h2>
             <div className="space-y-4">

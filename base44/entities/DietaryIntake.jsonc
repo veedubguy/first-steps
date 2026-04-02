@@ -1,0 +1,74 @@
+{
+  "name": "DietaryIntake",
+  "type": "object",
+  "properties": {
+    "child_id": {
+      "type": "string",
+      "description": "Reference to child record ID"
+    },
+    "dietary_type": {
+      "type": "string",
+      "description": "Primary dietary requirement (e.g. Halal, Vegetarian, Vegan, Kosher, Gluten-Free)"
+    },
+    "religious_requirement": {
+      "type": "string",
+      "description": "Religious dietary requirement (e.g. Halal, Kosher, Hindu Vegetarian)"
+    },
+    "foods_to_avoid": {
+      "type": "string",
+      "description": "Specific foods or ingredients to avoid"
+    },
+    "cross_contamination_concern": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ],
+      "description": "Is cross-contamination a concern?"
+    },
+    "cross_contamination_details": {
+      "type": "string",
+      "description": "Details about cross-contamination concerns"
+    },
+    "meal_alternatives": {
+      "type": "string",
+      "description": "Meal alternatives the family will provide or preferred alternatives"
+    },
+    "parent_will_provide_food": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No",
+        "Sometimes"
+      ],
+      "description": "Will the parent provide food from home?"
+    },
+    "additional_notes": {
+      "type": "string",
+      "description": "Any additional dietary notes or medical context"
+    },
+    "parent_name": {
+      "type": "string",
+      "description": "Parent name at time of submission"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date parent submitted the form"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Submitted",
+        "Reviewed"
+      ],
+      "default": "Pending",
+      "description": "Status of the dietary intake"
+    }
+  },
+  "required": [
+    "child_id",
+    "status"
+  ]
+}

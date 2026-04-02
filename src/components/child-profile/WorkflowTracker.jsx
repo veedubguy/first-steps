@@ -15,7 +15,7 @@ export default function WorkflowTracker({ planTracking = [], commPlan = null }) 
 
   const getStageStatus = (key) => {
     switch (key) {
-      case 'stage1': return planStatus === 'Sent' || planStatus === 'Signed' || commPlan ? 'done' : 'pending';
+      case 'stage1': return planStatus === 'Sent' || planStatus === 'Signed' || commPlan ? 'done' : planTracking.length > 0 ? 'active' : 'pending';
       case 'stage2': return (planStatus === 'Signed' || commPlan) ? 'done' : planStatus === 'Sent' ? 'active' : 'pending';
       case 'stage3': return commPlan?.centre_completed_date ? 'done' : (planStatus === 'Signed') ? 'active' : 'pending';
       case 'stage4': return commPlan?.status === 'Comm Pack Sent' || commPlan?.status === 'Complete' ? 'done' : commPlan?.centre_completed_date ? 'active' : 'pending';
