@@ -151,10 +151,11 @@ Return only extracted data. Use empty strings for fields not found.`,
         </label>
       </Card>
 
-      <div className="text-center">
+      <div className="text-center space-y-1">
         <Button variant="ghost" size="sm" onClick={() => onSkip(null)} className="text-muted-foreground gap-2">
           Skip — I'll fill in the form manually <ArrowRight className="w-3.5 h-3.5" />
         </Button>
+        <p className="text-xs text-muted-foreground">For Dietary children, skip the upload and select "Dietary" in the form</p>
       </div>
     </div>
   );
