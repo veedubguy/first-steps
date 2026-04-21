@@ -177,7 +177,9 @@ export default function ParentAcknowledgement() {
          <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
             {child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' :
-             child.condition_type === 'Asthma' ? 'Asthma Management Plan' : 'Dietary Management Plan'}
+             child.condition_type === 'Asthma' ? 'Asthma Management Plan' :
+             child.condition_type === 'Dietary' ? 'Dietary Management Plan' :
+             `${child.condition_type} Management Plan`}
           </h1>
           <p className="text-gray-500 mt-1">Please review and acknowledge this plan for your child</p>
         </div>
