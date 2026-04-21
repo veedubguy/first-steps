@@ -39,17 +39,35 @@ export default function ChildHeader({ child, onPhotoUpdated }) {
             </div>
           )}
           {child.condition_type === 'Asthma' && (
-            <div className="mt-2 space-y-1">
+            <div className="mt-2 space-y-2">
               {child.asthma_triggers && (
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase">Triggers</p>
                   <p className="text-sm font-medium text-blue-600 mt-0.5">{child.asthma_triggers}</p>
                 </div>
               )}
-              {child.reliever_medication && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase">Reliever</p>
-                  <p className="text-sm mt-0.5">{child.reliever_medication}</p>
+              {child.asthma_medications && child.asthma_medications.length > 0 && (
+                <div className="space-y-1.5">
+                  {child.asthma_medications.filter(m => m.at_service).length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase">At Service</p>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {child.asthma_medications.filter(m => m.at_service).map((m, i) => (
+                          <span key={i} className="text-xs bg-blue-100 text-blue-700 rounded px-2 py-0.5">{m.name}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {child.asthma_medications.filter(m => m.at_home && !m.at_service).length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase">At Home Only</p>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {child.asthma_medications.filter(m => m.at_home && !m.at_service).map((m, i) => (
+                          <span key={i} className="text-xs bg-green-100 text-green-700 rounded px-2 py-0.5">{m.name}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
