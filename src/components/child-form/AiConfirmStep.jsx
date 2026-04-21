@@ -166,7 +166,7 @@ export default function AiConfirmStep({ form, onChange, uploadedFile }) {
       </Card>
 
       {/* Risk Plan fields */}
-      {(form.trigger || form.reaction || form.control_measures || form.medication_required) && (
+      {(form.trigger || form.reaction || form.control_measures || (form.medications && form.medications.length > 0)) && (
         <Card className="p-5 space-y-4">
           <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide flex items-center gap-2">
             Risk Plan Details
@@ -184,15 +184,47 @@ export default function AiConfirmStep({ form, onChange, uploadedFile }) {
             <Label>Control Measures</Label>
             <Textarea value={form.control_measures} onChange={e => update('control_measures', e.target.value)} rows={2} placeholder="Steps to minimise risk" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Medication Required</Label>
-              <Input value={form.medication_required} onChange={e => update('medication_required', e.target.value)} placeholder="e.g. EpiPen 0.3mg" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Medication Location</Label>
-              <Input value={form.medication_location} onChange={e => update('medication_location', e.target.value)} placeholder="e.g. First Aid Room" />
-            </div>
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Medications</Label>
+            <p className="text-xs text-muted-foreground">Add each medication and indicate where it is administered.</p>
+            {(form.medications || []).map((med, idx) => (
+              <div key={idx} className="flex items-center gap-3 bg-muted/40 rounded-lg px-3 py-2">
+                <Input
+                  className="flex-1 bg-white"
+                  value={med.name}
+                  onChange={e => {
+                    const updated = [...(form.medications || [])];
+                    updated[idx] = { ...updated[idx], name: e.target.value };
+                    update('medications', updated);
+                  }}
+                  placeholder="e.g. EpiPen 0.3mg, Ventolin"
+                />
+                <label className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap cursor-pointer">
+                  <input type="checkbox" checked={!!med.at_service} onChange={e => {
+                    const updated = [...(form.medications || [])];
+                    updated[idx] = { ...updated[idx], at_service: e.target.checked };
+                    update('medications', updated);
+                  }} className="rounded" />
+                  At Service
+                </label>
+                <label className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap cursor-pointer">
+                  <input type="checkbox" checked={!!med.at_home} onChange={e => {
+                    const updated = [...(form.medications || [])];
+                    updated[idx] = { ...updated[idx], at_home: e.target.checked };
+                    update('medications', updated);
+                  }} className="rounded" />
+                  At Home
+                </label>
+                <button type="button" onClick={() => {
+                  const updated = (form.medications || []).filter((_, i) => i !== idx);
+                  update('medications', updated);
+                }} className="text-red-400 hover:text-red-600 text-lg font-bold leading-none">×</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => update('medications', [...(form.medications || []), { name: '', at_service: false, at_home: false }])}
+              className="text-sm text-primary hover:underline">
+              + Add Medication
+            </button>
           </div>
         </Card>
       )}

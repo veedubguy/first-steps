@@ -138,8 +138,9 @@ export default function ChildForm() {
       dietary_requirement: extracted.dietary_requirement || '',
       notes: extracted.notes || '',
       trigger: extracted.trigger || '',
-       reaction: extracted.reaction || '',
-       control_measures: extracted.control_measures || '',
+      reaction: extracted.reaction || '',
+      control_measures: extracted.control_measures || '',
+      medications: extracted.medications || [],
     });
     setStep('confirm');
   };
