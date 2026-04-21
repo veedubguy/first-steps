@@ -1,0 +1,55 @@
+{
+  "name": "RiskPlans",
+  "type": "object",
+  "properties": {
+    "child_id": {
+      "type": "string",
+      "description": "Reference to child record ID"
+    },
+    "trigger": {
+      "type": "string",
+      "description": "What triggers the reaction"
+    },
+    "exposure_risk": {
+      "type": "string",
+      "description": "How exposure may occur"
+    },
+    "reaction": {
+      "type": "string",
+      "description": "Expected reaction description"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "description": "Risk level assessment"
+    },
+    "control_measures": {
+      "type": "string",
+      "description": "Steps to minimise risk"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Next review date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Active",
+        "Review Due",
+        "Closed"
+      ],
+      "description": "Current plan status"
+    }
+  },
+  "required": [
+    "child_id",
+    "trigger",
+    "risk_level",
+    "status"
+  ]
+}

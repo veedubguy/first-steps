@@ -1,0 +1,57 @@
+{
+  "name": "Medication",
+  "type": "object",
+  "properties": {
+    "child_id": {
+      "type": "string",
+      "description": "Reference to child record ID"
+    },
+    "risk_plan_id": {
+      "type": "string",
+      "description": "Reference to risk plan ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Medication name and dose"
+    },
+    "at_service": {
+      "type": "boolean",
+      "description": "Is medication administered at service?"
+    },
+    "at_home": {
+      "type": "boolean",
+      "description": "Is medication administered at home?"
+    },
+    "location_at_service": {
+      "type": "string",
+      "description": "Where medication is stored at service"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expiry date of the medication"
+    },
+    "supplied_by": {
+      "type": "string",
+      "description": "Who supplied the medication (e.g. parent name)"
+    },
+    "supplied_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date medication was supplied"
+    },
+    "parent_confirmed": {
+      "type": "boolean",
+      "description": "Has parent confirmed location?"
+    },
+    "parent_confirmed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date parent confirmed medication location"
+    }
+  },
+  "required": [
+    "child_id",
+    "name"
+  ]
+}
