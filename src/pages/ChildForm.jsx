@@ -26,6 +26,7 @@ const emptyForm = {
   asthma_severity: 'Mild',
   reliever_medication: '',
   preventer_medication: '',
+  asthma_medications: [],
   dietary_requirement: '',
   parent_name: '',
   parent_email: '',
@@ -263,29 +264,68 @@ export default function ChildForm() {
           )}
 
           {form.condition_type === 'Asthma' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>Asthma Triggers</Label>
-                <Input value={form.asthma_triggers} onChange={e => update('asthma_triggers', e.target.value)} placeholder="e.g. Exercise, Cold air, Dust, Smoke" />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Asthma Triggers</Label>
+                  <Input value={form.asthma_triggers} onChange={e => update('asthma_triggers', e.target.value)} placeholder="e.g. Exercise, Cold air, Dust, Smoke" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Asthma Severity</Label>
+                  <Select value={form.asthma_severity} onValueChange={v => update('asthma_severity', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Mild">Mild</SelectItem>
+                      <SelectItem value="Moderate">Moderate</SelectItem>
+                      <SelectItem value="Severe">Severe</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <Label>Asthma Severity</Label>
-                <Select value={form.asthma_severity} onValueChange={v => update('asthma_severity', v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Mild">Mild</SelectItem>
-                    <SelectItem value="Moderate">Moderate</SelectItem>
-                    <SelectItem value="Severe">Severe</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Reliever Medication</Label>
-                <Input value={form.reliever_medication} onChange={e => update('reliever_medication', e.target.value)} placeholder="e.g. Ventolin 2-4 puffs via spacer" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Preventer Medication</Label>
-                <Input value={form.preventer_medication} onChange={e => update('preventer_medication', e.target.value)} placeholder="e.g. Flixotide 1 puff morning & night" />
+
+              {/* Medications list */}
+              <div className="space-y-2">
+                <Label>Medications</Label>
+                <p className="text-xs text-muted-foreground">Add each medication individually and indicate where it is used.</p>
+                {(form.asthma_medications || []).map((med, idx) => (
+                  <div key={idx} className="flex items-center gap-3 bg-muted/40 rounded-lg px-3 py-2">
+                    <Input
+                      className="flex-1 bg-white"
+                      value={med.name}
+                      onChange={e => {
+                        const updated = [...(form.asthma_medications || [])];
+                        updated[idx] = { ...updated[idx], name: e.target.value };
+                        update('asthma_medications', updated);
+                      }}
+                      placeholder="e.g. Ventolin 2-4 puffs via spacer"
+                    />
+                    <label className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap cursor-pointer">
+                      <input type="checkbox" checked={!!med.at_service} onChange={e => {
+                        const updated = [...(form.asthma_medications || [])];
+                        updated[idx] = { ...updated[idx], at_service: e.target.checked };
+                        update('asthma_medications', updated);
+                      }} className="rounded" />
+                      At Service
+                    </label>
+                    <label className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap cursor-pointer">
+                      <input type="checkbox" checked={!!med.at_home} onChange={e => {
+                        const updated = [...(form.asthma_medications || [])];
+                        updated[idx] = { ...updated[idx], at_home: e.target.checked };
+                        update('asthma_medications', updated);
+                      }} className="rounded" />
+                      At Home
+                    </label>
+                    <button type="button" onClick={() => {
+                      const updated = (form.asthma_medications || []).filter((_, i) => i !== idx);
+                      update('asthma_medications', updated);
+                    }} className="text-red-400 hover:text-red-600 text-lg font-bold leading-none">×</button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={() => {
+                  update('asthma_medications', [...(form.asthma_medications || []), { name: '', at_service: false, at_home: false }]);
+                }}>
+                  + Add Medication
+                </Button>
               </div>
             </div>
           )}

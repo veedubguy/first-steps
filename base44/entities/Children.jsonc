@@ -1,0 +1,133 @@
+{
+  "name": "Children",
+  "type": "object",
+  "properties": {
+    "child_id": {
+      "type": "string",
+      "description": "Unique child identifier"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "Child's first name"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Child's last name"
+    },
+    "dob": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of birth"
+    },
+    "room_group": {
+      "type": "string",
+      "description": "Room or group assignment"
+    },
+    "condition_type": {
+      "type": "string",
+      "enum": [
+        "Allergy",
+        "Dietary",
+        "Asthma"
+      ],
+      "description": "Type of condition"
+    },
+    "allergens": {
+      "type": "string",
+      "description": "Known allergens (comma-separated)"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Moderate",
+        "Anaphylaxis"
+      ],
+      "description": "Severity of allergy"
+    },
+    "asthma_triggers": {
+      "type": "string",
+      "description": "Known asthma triggers (e.g. Exercise, Cold air, Dust)"
+    },
+    "asthma_severity": {
+      "type": "string",
+      "enum": [
+        "Mild",
+        "Moderate",
+        "Severe"
+      ],
+      "description": "Severity of asthma"
+    },
+    "reliever_medication": {
+      "type": "string",
+      "description": "Reliever medication (legacy field)"
+    },
+    "preventer_medication": {
+      "type": "string",
+      "description": "Preventer medication (legacy field)"
+    },
+    "asthma_medications": {
+      "type": "array",
+      "description": "List of asthma medications with location info",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Medication name and dose"
+          },
+          "at_service": {
+            "type": "boolean",
+            "description": "Used at service"
+          },
+          "at_home": {
+            "type": "boolean",
+            "description": "Used at home"
+          }
+        }
+      }
+    },
+    "dietary_requirement": {
+      "type": "string",
+      "description": "Dietary requirement details (e.g. Halal, No Dairy)"
+    },
+    "parent_name": {
+      "type": "string",
+      "description": "Parent/guardian name"
+    },
+    "parent_email": {
+      "type": "string",
+      "description": "Parent email address"
+    },
+    "parent_phone": {
+      "type": "string",
+      "description": "Parent phone number"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "doctor_plan_url": {
+      "type": "string",
+      "description": "URL of uploaded doctor's/ASCIA action plan file"
+    },
+    "doctor_plan_filename": {
+      "type": "string",
+      "description": "Original filename of the uploaded doctor plan"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "URL of the child's photo"
+    },
+    "archived": {
+      "type": "boolean",
+      "description": "Is this child record archived?",
+      "default": false
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "condition_type"
+  ]
+}
