@@ -58,6 +58,7 @@ export default function ActionPlanUploadStep({ onExtracted, onSkip }) {
     - reaction (expected reaction — allergy)
     - control_measures (key steps to minimise risk)
    
+    - medications (array of medication objects with: name (string). Extract all medications mentioned in the plan. For asthma include reliever and preventer. For allergies include emergency meds. Leave empty array if none found.)
     - dietary_requirement (if dietary, e.g. "Halal, No Dairy", otherwise empty string)
     - notes (any other important notes)
     - child_first_name (child's first name if visible)
@@ -82,7 +83,15 @@ export default function ActionPlanUploadStep({ onExtracted, onSkip }) {
              trigger: { type: 'string' },
              reaction: { type: 'string' },
              control_measures: { type: 'string' },
-
+             medications: {
+               type: 'array',
+               items: {
+                 type: 'object',
+                 properties: {
+                   name: { type: 'string' },
+                 },
+               },
+             },
              dietary_requirement: { type: 'string' },
              notes: { type: 'string' },
              child_first_name: { type: 'string' },

@@ -166,7 +166,7 @@ export default function AiConfirmStep({ form, onChange, uploadedFile }) {
       </Card>
 
       {/* Risk Plan fields */}
-      {(form.trigger || form.reaction || form.control_measures) && (
+      {(form.trigger || form.reaction || form.control_measures || (form.medications && form.medications.length > 0)) && (
         <Card className="p-5 space-y-4">
           <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide flex items-center gap-2">
             Risk Plan Details
@@ -181,11 +181,19 @@ export default function AiConfirmStep({ form, onChange, uploadedFile }) {
             <Textarea value={form.reaction} onChange={e => update('reaction', e.target.value)} rows={2} placeholder="Expected reaction if exposed" />
           </div>
           <div className="space-y-1.5">
-            <Label>Control Measures</Label>
-            <Textarea value={form.control_measures} onChange={e => update('control_measures', e.target.value)} rows={2} placeholder="Steps to minimise risk" />
-          </div>
-
-        </Card>
+             <Label>Control Measures</Label>
+             <Textarea value={form.control_measures} onChange={e => update('control_measures', e.target.value)} rows={2} placeholder="Steps to minimise risk" />
+           </div>
+           {form.medications && form.medications.length > 0 && (
+             <div className="space-y-1.5">
+               <Label>Medications extracted</Label>
+               <p className="text-xs text-muted-foreground mb-2">Parent will confirm location (at service/home) via email</p>
+               {form.medications.map((med, idx) => (
+                 <div key={idx} className="text-sm bg-muted/40 rounded-lg px-3 py-2">{med.name}</div>
+               ))}
+             </div>
+           )}
+          </Card>
       )}
 
       {/* Parent info */}

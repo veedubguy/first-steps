@@ -36,6 +36,7 @@ const emptyForm = {
   trigger: '',
   reaction: '',
   control_measures: '',
+  medications: [],
 };
 
 export default function ChildForm() {
@@ -64,7 +65,7 @@ export default function ChildForm() {
   const mutation = useMutation({
     mutationFn: async (data) => {
       // Separate child fields from risk-plan fields
-      const { trigger, reaction, control_measures, ...childData } = data;
+      const { trigger, reaction, control_measures, medications, ...childData } = data;
 
       let child;
       if (isEditing) {
@@ -80,7 +81,7 @@ export default function ChildForm() {
 
       // If creating and we have risk plan data, create the risk plan too
       if (!isEditing && (trigger || reaction || control_measures)) {
-        await base44.entities.RiskPlans.create({
+        const riskPlan = await base44.entities.RiskPlans.create({
           child_id: child.id,
           trigger: trigger || '',
           reaction: reaction || '',
@@ -89,6 +90,22 @@ export default function ChildForm() {
           risk_level: data.severity === 'Anaphylaxis' ? 'High' : data.severity === 'Moderate' ? 'Medium' : 'Low',
           status: 'Active',
         });
+
+        // Create medication records from AI extraction (parent will confirm location via email)
+        if (medications && medications.length > 0) {
+          for (const med of medications) {
+            if (med.name) {
+              await base44.entities.Medication.create({
+                child_id: child.id,
+                risk_plan_id: riskPlan.id,
+                name: med.name,
+                at_service: false,
+                at_home: false,
+                parent_confirmed: false,
+              });
+            }
+          }
+        }
       }
 
       return child;
