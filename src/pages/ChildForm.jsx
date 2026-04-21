@@ -36,7 +36,6 @@ const emptyForm = {
   trigger: '',
   reaction: '',
   control_measures: '',
-  medications: [],
 };
 
 export default function ChildForm() {
@@ -65,7 +64,7 @@ export default function ChildForm() {
   const mutation = useMutation({
     mutationFn: async (data) => {
       // Separate child fields from risk-plan fields
-      const { trigger, reaction, control_measures, medications, ...childData } = data;
+      const { trigger, reaction, control_measures, ...childData } = data;
 
       let child;
       if (isEditing) {
@@ -81,7 +80,7 @@ export default function ChildForm() {
 
       // If creating and we have risk plan data, create the risk plan too
       if (!isEditing && (trigger || reaction || control_measures)) {
-        const riskPlan = await base44.entities.RiskPlans.create({
+        await base44.entities.RiskPlans.create({
           child_id: child.id,
           trigger: trigger || '',
           reaction: reaction || '',
@@ -90,22 +89,6 @@ export default function ChildForm() {
           risk_level: data.severity === 'Anaphylaxis' ? 'High' : data.severity === 'Moderate' ? 'Medium' : 'Low',
           status: 'Active',
         });
-
-        // Create medication records if provided
-        if (medications && medications.length > 0) {
-          for (const med of medications) {
-            if (med.name) {
-              await base44.entities.Medication.create({
-                child_id: child.id,
-                risk_plan_id: riskPlan.id,
-                name: med.name,
-                at_service: med.at_service || false,
-                at_home: med.at_home || false,
-                parent_confirmed: false,
-              });
-            }
-          }
-        }
       }
 
       return child;
@@ -385,49 +368,7 @@ export default function ChildForm() {
                 <Label>Control Measures</Label>
                 <Textarea value={form.control_measures} onChange={e => update('control_measures', e.target.value)} rows={2} placeholder="Steps to minimise risk" />
               </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>Medications</Label>
-                <p className="text-xs text-muted-foreground">Add each medication and indicate where it is administered.</p>
-                {(form.medications || []).map((med, idx) => (
-                  <div key={idx} className="flex items-center gap-3 bg-muted/40 rounded-lg px-3 py-2">
-                    <Input
-                      className="flex-1 bg-white"
-                      value={med.name}
-                      onChange={e => {
-                        const updated = [...(form.medications || [])];
-                        updated[idx] = { ...updated[idx], name: e.target.value };
-                        update('medications', updated);
-                      }}
-                      placeholder="e.g. EpiPen, Ventolin 2-4 puffs"
-                    />
-                    <label className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap cursor-pointer">
-                      <input type="checkbox" checked={!!med.at_service} onChange={e => {
-                        const updated = [...(form.medications || [])];
-                        updated[idx] = { ...updated[idx], at_service: e.target.checked };
-                        update('medications', updated);
-                      }} className="rounded" />
-                      At Service
-                    </label>
-                    <label className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap cursor-pointer">
-                      <input type="checkbox" checked={!!med.at_home} onChange={e => {
-                        const updated = [...(form.medications || [])];
-                        updated[idx] = { ...updated[idx], at_home: e.target.checked };
-                        update('medications', updated);
-                      }} className="rounded" />
-                      At Home
-                    </label>
-                    <button type="button" onClick={() => {
-                      const updated = (form.medications || []).filter((_, i) => i !== idx);
-                      update('medications', updated);
-                    }} className="text-red-400 hover:text-red-600 text-lg font-bold leading-none">×</button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" size="sm" onClick={() => {
-                  update('medications', [...(form.medications || []), { name: '', at_service: false, at_home: false }]);
-                }}>
-                  + Add Medication
-                </Button>
-              </div>
+
             </div>
           </Card>
         )}
