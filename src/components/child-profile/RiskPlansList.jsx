@@ -1,10 +1,11 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { format } from 'date-fns';
-import { Shield } from 'lucide-react';
+import { Shield, Trash2 } from 'lucide-react';
 
-export default function RiskPlansList({ plans, child }) {
+export default function RiskPlansList({ plans, child, onDelete, isDeleting }) {
   if (!plans || plans.length === 0) {
     return (
       <Card className="p-8 text-center">
@@ -28,11 +29,24 @@ export default function RiskPlansList({ plans, child }) {
                 <StatusBadge type={plan.status} />
                 {isOverdue && <StatusBadge type="review_due" />}
               </div>
-              {plan.review_date && (
-                <p className="text-xs text-muted-foreground shrink-0">
-                  Review: {format(new Date(plan.review_date), 'dd MMM yyyy')}
-                </p>
-              )}
+              <div className="flex items-center gap-2 shrink-0">
+                {plan.review_date && (
+                  <p className="text-xs text-muted-foreground">
+                    Review: {format(new Date(plan.review_date), 'dd MMM yyyy')}
+                  </p>
+                )}
+                {onDelete && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(plan.id)}
+                    disabled={isDeleting}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
             </div>
             <div className="space-y-1">
               <div>

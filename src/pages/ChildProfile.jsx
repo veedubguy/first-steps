@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2, Mail, Link2, Users, Archive, RotateCcw, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Plus, MessageSquare, Send, CheckCircle, Printer, Loader2, Mail, Link2, Users, Archive, RotateCcw, AlertCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ChildHeader from '@/components/child-profile/ChildHeader';
@@ -199,6 +199,24 @@ export default function ChildProfile() {
     },
   });
 
+  const deleteRiskPlanMutation = useMutation({
+    mutationFn: async (planId) => {
+      // Delete associated medication records
+      const meds = await base44.entities.Medication.filter({ risk_plan_id: planId });
+      for (const med of meds) {
+        await base44.entities.Medication.delete(med.id);
+      }
+      // Delete the risk plan
+      await base44.entities.RiskPlans.delete(planId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['riskPlans', id] });
+      queryClient.invalidateQueries({ queryKey: ['medications', id] });
+      toast.success('Risk plan deleted');
+    },
+    onError: () => toast.error('Failed to delete risk plan'),
+  });
+
   const isLoading = loadingChild || loadingPlans || loadingComms || loadingTracking;
 
   if (isLoading) {
@@ -342,7 +360,11 @@ export default function ChildProfile() {
       {/* Risk Plans */}
       <div>
         <h3 className="font-semibold text-sm mb-3">Risk Minimisation Plans ({riskPlans.length})</h3>
-        <RiskPlansList plans={riskPlans} child={child} />
+        <RiskPlansList plans={riskPlans} child={child} onDelete={(planId) => {
+          if (confirm('Delete this risk plan and all associated medications?')) {
+            deleteRiskPlanMutation.mutate(planId);
+          }
+        }} isDeleting={deleteRiskPlanMutation.isPending} />
       </div>
 
       {/* Staff Sign-offs */}
