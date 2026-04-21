@@ -342,7 +342,7 @@ export default function ChildProfile() {
       {/* Risk Plans */}
       <div>
         <h3 className="font-semibold text-sm mb-3">Risk Minimisation Plans ({riskPlans.length})</h3>
-        <RiskPlansList plans={riskPlans} />
+        <RiskPlansList plans={riskPlans} child={child} />
       </div>
 
       {/* Staff Sign-offs */}
