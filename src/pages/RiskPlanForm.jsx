@@ -74,11 +74,33 @@ export default function RiskPlanForm() {
   }, [existingPlans, childData, editPlanId]);
 
   const mutation = useMutation({
-    mutationFn: (data) => editPlanId
-      ? base44.entities.RiskPlans.update(editPlanId, data)
-      : base44.entities.RiskPlans.create(data),
+    mutationFn: async (data) => {
+      let riskPlan;
+      if (editPlanId) {
+        riskPlan = await base44.entities.RiskPlans.update(editPlanId, data);
+      } else {
+        riskPlan = await base44.entities.RiskPlans.create(data);
+        // Create Medication records for each medication in the plan
+        if (data.medications && data.medications.length > 0) {
+          for (const med of data.medications) {
+            if (med.name) {
+              await base44.entities.Medication.create({
+                child_id: childId,
+                risk_plan_id: riskPlan.id,
+                name: med.name,
+                at_service: false,
+                at_home: false,
+                parent_confirmed: false,
+              });
+            }
+          }
+        }
+      }
+      return riskPlan;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['riskPlans', childId] });
+      queryClient.invalidateQueries({ queryKey: ['medications', childId] });
       toast.success(editPlanId ? 'Risk plan updated' : 'Risk plan created');
       navigate(`/children/${childId}`);
     },
