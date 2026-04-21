@@ -31,6 +31,19 @@
       "type": "string",
       "description": "Steps to minimise risk"
     },
+    "medications": {
+      "type": "array",
+      "description": "List of medications for this condition",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Medication name and dose"
+          }
+        }
+      }
+    },
     "review_date": {
       "type": "string",
       "format": "date",
