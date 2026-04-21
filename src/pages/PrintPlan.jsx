@@ -287,19 +287,43 @@ export default function PrintPlan() {
             </tr>
           </thead>
           <tbody>
-            {activePlans.filter(p => p.medication_required).map(plan => (
-              <tr key={plan.id}>
-                <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px' }}>{plan.medication_required}</td>
-                <td style={TD}>{plan.medication_expiry_date ? format(new Date(plan.medication_expiry_date), 'dd/MM/yyyy') : ''}</td>
-                <td style={TD}>{plan.medication_supplied_by || ''}{plan.medication_supplied_date ? ` – ${format(new Date(plan.medication_supplied_date), 'dd/MM/yyyy')}` : ''}</td>
-                <td style={TD}></td>
-                <td style={TD}>{plan.medication_location || ''}</td>
-                <td style={TD}></td>
-              </tr>
-            ))}
-            {[...Array(Math.max(3, 3 - activePlans.filter(p => p.medication_required).length))].map((_, i) => (
-              <tr key={i}>{[...Array(6)].map((_, j) => <td key={j} style={{ ...TD, height: '30px' }}></td>)}</tr>
-            ))}
+            {isAsthma && child.asthma_medications && child.asthma_medications.length > 0 ? (
+              <>
+                {child.asthma_medications.map((med, i) => (
+                  <tr key={i}>
+                    <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px' }}>{med.name}</td>
+                    <td style={TD}></td>
+                    <td style={TD}></td>
+                    <td style={TD}>
+                      {med.at_service && <span>✓ At Service</span>}
+                      {med.at_home && !med.at_service && <span>At Home only</span>}
+                      {med.at_service && med.at_home && <span>✓ At Service &amp; At Home</span>}
+                    </td>
+                    <td style={TD}>{med.at_service ? activePlans[0]?.medication_location || '' : 'Home'}</td>
+                    <td style={TD}></td>
+                  </tr>
+                ))}
+                {[...Array(Math.max(0, 3 - child.asthma_medications.length))].map((_, i) => (
+                  <tr key={i}>{[...Array(6)].map((_, j) => <td key={j} style={{ ...TD, height: '30px' }}></td>)}</tr>
+                ))}
+              </>
+            ) : (
+              <>
+                {activePlans.filter(p => p.medication_required).map(plan => (
+                  <tr key={plan.id}>
+                    <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px' }}>{plan.medication_required}</td>
+                    <td style={TD}>{plan.medication_expiry_date ? format(new Date(plan.medication_expiry_date), 'dd/MM/yyyy') : ''}</td>
+                    <td style={TD}>{plan.medication_supplied_by || ''}{plan.medication_supplied_date ? ` – ${format(new Date(plan.medication_supplied_date), 'dd/MM/yyyy')}` : ''}</td>
+                    <td style={TD}></td>
+                    <td style={TD}>{plan.medication_location || ''}</td>
+                    <td style={TD}></td>
+                  </tr>
+                ))}
+                {[...Array(Math.max(3, 3 - activePlans.filter(p => p.medication_required).length))].map((_, i) => (
+                  <tr key={i}>{[...Array(6)].map((_, j) => <td key={j} style={{ ...TD, height: '30px' }}></td>)}</tr>
+                ))}
+              </>
+            )}
           </tbody>
         </table>
 

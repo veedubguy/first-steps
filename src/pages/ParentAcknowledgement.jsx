@@ -165,7 +165,9 @@ export default function ParentAcknowledgement() {
     );
   }
 
-  const activePlans = riskPlans.filter(p => p.status !== 'Closed');
+  // Only use the single most recent active plan
+  const allActivePlans = riskPlans.filter(p => p.status !== 'Closed');
+  const activePlans = allActivePlans.slice(0, 1);
 
   const handleParentInputChange = (field, value) => {
     setParentInput(prev => ({ ...prev, [field]: value }));
