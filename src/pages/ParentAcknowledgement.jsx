@@ -253,25 +253,24 @@ export default function ParentAcknowledgement() {
             </div>
           </section>
 
-          {/* Risk Plans */}
+          {/* Risk Plans — only show the first (most recent) plan */}
           {activePlans.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 rounded mb-3 text-gray-700">Risk Minimisation Plans</h2>
-              {activePlans.map((plan, idx) => (
-                <div key={plan.id} className="px-3 mb-4 text-sm">
-                  {activePlans.length > 1 && <p className="font-semibold mb-1">Plan {idx + 1}</p>}
+              <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 rounded mb-3 text-gray-700">Risk Minimisation Plan</h2>
+              {activePlans[0] && (
+                <div className="px-3 mb-4 text-sm">
                   <div className="space-y-1.5 text-sm">
-                    <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Trigger:</span><span>{plan.trigger}</span></div>
-                    {plan.exposure_risk && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Exposure Risk:</span><span>{plan.exposure_risk}</span></div>}
-                    {plan.reaction && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Reaction:</span><span>{plan.reaction}</span></div>}
-                    <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Risk Level:</span><span className="font-semibold">{plan.risk_level}</span></div>
-                    {plan.control_measures && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Control Measures:</span><span>{plan.control_measures}</span></div>}
-                    {plan.medication_required && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Medication:</span><span>{plan.medication_required}</span></div>}
-                    {plan.medication_location && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Stored At:</span><span>{plan.medication_location}</span></div>}
-                    {plan.review_date && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Review Date:</span><span>{format(new Date(plan.review_date), 'dd/MM/yyyy')}</span></div>}
+                    <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Trigger:</span><span>{activePlans[0].trigger}</span></div>
+                    {activePlans[0].exposure_risk && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Exposure Risk:</span><span>{activePlans[0].exposure_risk}</span></div>}
+                    {activePlans[0].reaction && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Reaction:</span><span>{activePlans[0].reaction}</span></div>}
+                    <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Risk Level:</span><span className="font-semibold">{activePlans[0].risk_level}</span></div>
+                    {activePlans[0].control_measures && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Control Measures:</span><span>{activePlans[0].control_measures}</span></div>}
+                    {activePlans[0].medication_required && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Medication:</span><span>{activePlans[0].medication_required}</span></div>}
+                    {activePlans[0].medication_location && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Stored At:</span><span>{activePlans[0].medication_location}</span></div>}
+                    {activePlans[0].review_date && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Review Date:</span><span>{format(new Date(activePlans[0].review_date), 'dd/MM/yyyy')}</span></div>}
                   </div>
                 </div>
-              ))}
+              )}
             </section>
           )}
 
