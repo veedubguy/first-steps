@@ -50,6 +50,10 @@ export default function ParentAcknowledgement() {
     setPhotoPreview(URL.createObjectURL(file));
   };
 
+  // Only use the single most recent active plan
+  const allActivePlans = riskPlans.filter(p => p.status !== 'Closed');
+  const activePlans = allActivePlans.slice(0, 1);
+
   const signMutation = useMutation({
     mutationFn: async () => {
       // Upload the signature image
@@ -164,10 +168,6 @@ export default function ParentAcknowledgement() {
       </div>
     );
   }
-
-  // Only use the single most recent active plan
-  const allActivePlans = riskPlans.filter(p => p.status !== 'Closed');
-  const activePlans = allActivePlans.slice(0, 1);
 
   const handleParentInputChange = (field, value) => {
     setParentInput(prev => ({ ...prev, [field]: value }));
