@@ -47,7 +47,7 @@ export default function SendToStaffModal({ open, onClose, child }) {
         });
 
         // Send email
-        await base44.integrations.Core.SendEmail({
+        await base44.functions.invoke('sendEmail', {
           from_name: 'First Steps OSHC',
           to: s.email,
           subject: `Action Required: Please sign off on ${childName}'s Risk Minimisation Plan`,

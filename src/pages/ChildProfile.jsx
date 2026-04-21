@@ -85,7 +85,7 @@ export default function ChildProfile() {
       // Dietary children get a different form
       if (child.condition_type === 'Dietary') {
         const dietaryUrl = `${window.location.origin}/parent-dietary-form?child=${id}`;
-        await base44.integrations.Core.SendEmail({
+        await base44.functions.invoke('sendEmail', {
           to: child.parent_email,
           subject: `Action Required: Please complete ${child.first_name}'s Dietary Requirement Form`,
           body: `Dear ${child.parent_name || 'Parent/Guardian'},\n\nTo ensure we can safely accommodate ${child.first_name} ${child.last_name}'s dietary needs at our service, we ask that you complete the dietary requirement form below.\n\nThis form covers dietary requirements, religious needs, foods to avoid, cross-contamination concerns, and meal arrangements.\n\nPlease complete the form here:\n\n${dietaryUrl}\n\nIf you have any questions, please contact us directly.\n\nKind regards,\nFirst Steps Before & After School Care`,
@@ -109,10 +109,10 @@ export default function ChildProfile() {
       const ackUrl = `${window.location.origin}/parent-acknowledgement?child=${id}${planParam}`;
       const planType = child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' : 'Asthma Management Plan';
 
-      await base44.integrations.Core.SendEmail({
+      await base44.functions.invoke('sendEmail', {
         to: child.parent_email,
         subject: `Action Required: Please review and sign ${child.first_name}'s ${planType}`,
-        body: `Dear ${child.parent_name || 'Parent/Guardian'},\n\nPlease review and digitally sign the ${planType} for ${child.first_name} ${child.last_name}.\n\nClick the link below to view the plan and provide your acknowledgement:\n\n${ackUrl}\n\nIf you have any questions, please contact the service directly.\n\nKind regards,\nOSHC Service Team`,
+        body: `Dear ${child.parent_name || 'Parent/Guardian'},\n\nPlease review and digitally sign the ${planType} for ${child.first_name} ${child.last_name}.\n\nClick the link below to view the plan and provide your acknowledgement:\n\n${ackUrl}\n\nIf you have any questions, please contact the service directly.\n\nKind regards,\nFirst Steps Before & After School Care`,
       });
 
       // Log the communication

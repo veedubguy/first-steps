@@ -98,7 +98,7 @@ export default function CentreCommPlan() {
 
       const commUrl = `${window.location.origin}/parent-comm-plan?child=${id}&plan=${planId}`;
 
-      await base44.integrations.Core.SendEmail({
+      await base44.functions.invoke('sendEmail', {
         to: child.parent_email,
         subject: `Action Required: Please review and sign ${child.first_name}'s Communication Plan`,
         body: `Dear ${child.parent_name || 'Parent/Guardian'},\n\nThank you for returning the Risk Minimisation Plan for ${child.first_name} ${child.last_name}.\n\nWe have now prepared the Communication Plan which outlines the responsibilities of both the centre and your family. Please review and sign this document at the link below:\n\n${commUrl}\n\nThis is the final step to complete your child's medical management documentation.\n\nKind regards,\nFirst Steps Before & After School Care`,

@@ -25,7 +25,7 @@ export default function StaffSignoffStatus({ childId }) {
       const signoffUrl = `${window.location.origin}/staff-acknowledgement?child=${childId}`;
       const childName = `${child.first_name} ${child.last_name}`;
       
-      await base44.integrations.Core.SendEmail({
+      await base44.functions.invoke('sendEmail', {
         from_name: 'First Steps OSHC',
         to: request.staff_email,
         subject: `Reminder: Please sign off on ${childName}'s Risk Minimisation Plan`,
