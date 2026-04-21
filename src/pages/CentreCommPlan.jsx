@@ -96,7 +96,7 @@ export default function CentreCommPlan() {
         planId = created.id;
       }
 
-      const commUrl = `${window.location.origin}/parent-comm-plan?child=${id}&plan=${planId}`;
+      const commUrl = `https://prompt-care-safe-sync.base44.app/parent-comm-plan?child=${id}&plan=${planId}`;
 
       await base44.functions.invoke('sendEmail', {
         to: child.parent_email,
@@ -126,7 +126,7 @@ export default function CentreCommPlan() {
 
   const copyLink = () => {
     const planId = existingPlan?.id || '';
-    const url = `${window.location.origin}/parent-comm-plan?child=${id}${planId ? `&plan=${planId}` : ''}`;
+    const url = `https://prompt-care-safe-sync.base44.app/parent-comm-plan?child=${id}${planId ? `&plan=${planId}` : ''}`;
     navigator.clipboard.writeText(url);
     toast.success('Parent comm plan link copied');
   };

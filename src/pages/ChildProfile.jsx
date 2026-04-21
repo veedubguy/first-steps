@@ -85,7 +85,7 @@ export default function ChildProfile() {
 
       // Dietary children get a different form
       if (child.condition_type === 'Dietary') {
-        const dietaryUrl = `${window.location.origin}/parent-dietary-form?child=${id}`;
+        const dietaryUrl = `https://prompt-care-safe-sync.base44.app/parent-dietary-form?child=${id}`;
         console.log('[sendToParent] sending dietary email to:', child.parent_email);
       await base44.functions.invoke('sendEmail', {
           to: child.parent_email,
@@ -108,7 +108,7 @@ export default function ChildProfile() {
 
       const planRecord = planTracking.find(p => p.plan_status === 'Draft') || planTracking[0];
       const planParam = planRecord ? `&plan=${planRecord.id}` : '';
-      const ackUrl = `${window.location.origin}/parent-acknowledgement?child=${id}${planParam}`;
+      const ackUrl = `https://prompt-care-safe-sync.base44.app/parent-acknowledgement?child=${id}${planParam}`;
       const planType = child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' : 'Asthma Management Plan';
 
       console.log('[sendToParent] sending plan email to:', child.parent_email, 'planType:', planType, 'ackUrl:', ackUrl);
@@ -287,7 +287,7 @@ export default function ChildProfile() {
         <Button
           variant="outline" size="sm" className="gap-2 border-green-300 text-green-700 hover:bg-green-50"
           onClick={() => {
-            const url = `${window.location.origin}/parent-acknowledgement?child=${id}`;
+            const url = `https://prompt-care-safe-sync.base44.app/parent-acknowledgement?child=${id}`;
             navigator.clipboard.writeText(url);
             toast.success('Parent link copied — ready to paste into SMS');
           }}
