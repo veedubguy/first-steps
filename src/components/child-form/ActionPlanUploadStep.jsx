@@ -44,60 +44,68 @@ export default function ActionPlanUploadStep({ onExtracted, onSkip }) {
     setExtracting(true);
 
     try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are reviewing a medical action plan or doctor's letter for a child at an OSHC (Outside School Hours Care) service. The plan may be for food allergies, dietary requirements, or asthma.
-Extract the following information:
-- condition_type (one of: "Allergy", "Dietary", "Asthma")
-- allergens (comma-separated list, e.g. "Peanuts, Tree Nuts" — allergy only)
-- severity (one of: "Low", "Moderate", "Anaphylaxis" — allergy only)
-- asthma_severity (one of: "Mild", "Moderate", "Severe" — asthma only)
-- asthma_triggers (comma-separated, e.g. "Exercise, Cold air, Dust" — asthma only)
-- reliever_medication (e.g. "Ventolin 2-4 puffs via spacer" — asthma)
-- preventer_medication (e.g. "Flixotide 1 puff twice daily" — asthma or empty string)
-- trigger (what triggers the reaction — allergy)
-- reaction (expected reaction — allergy)
-- control_measures (key steps to minimise risk)
-- medication_required (medication name and dose e.g. "EpiPen 0.3mg" or empty string)
-- medication_location (where stored, or empty string)
-- dietary_requirement (if dietary, e.g. "Halal, No Dairy", otherwise empty string)
-- notes (any other important notes)
-- child_first_name (child's first name if visible)
-- child_last_name (child's last name if visible)
-- child_dob (date of birth in YYYY-MM-DD format if visible, otherwise empty string)
-- parent_name (parent/guardian name if visible)
-- parent_phone (parent phone if visible)
-- parent_email (parent email if visible)
+       const result = await base44.integrations.Core.InvokeLLM({
+         prompt: `You are reviewing a medical action plan or doctor's letter for a child at an OSHC (Outside School Hours Care) service. The plan may be for food allergies, dietary requirements, or asthma.
+    Extract the following information:
+    - condition_type (one of: "Allergy", "Dietary", "Asthma")
+    - allergens (comma-separated list, e.g. "Peanuts, Tree Nuts" — allergy only)
+    - severity (one of: "Low", "Moderate", "Anaphylaxis" — allergy only)
+    - asthma_severity (one of: "Mild", "Moderate", "Severe" — asthma only)
+    - asthma_triggers (comma-separated, e.g. "Exercise, Cold air, Dust" — asthma only)
+    - reliever_medication (e.g. "Ventolin 2-4 puffs via spacer" — asthma)
+    - preventer_medication (e.g. "Flixotide 1 puff twice daily" — asthma or empty string)
+    - trigger (what triggers the reaction — allergy)
+    - reaction (expected reaction — allergy)
+    - control_measures (key steps to minimise risk)
+    - medications (array of medication objects with: name (string), at_service (boolean), at_home (boolean). Extract from the plan. For asthma, include reliever and preventer. For allergies, include emergency medications. Leave empty array if none found.)
+    - dietary_requirement (if dietary, e.g. "Halal, No Dairy", otherwise empty string)
+    - notes (any other important notes)
+    - child_first_name (child's first name if visible)
+    - child_last_name (child's last name if visible)
+    - child_dob (date of birth in YYYY-MM-DD format if visible, otherwise empty string)
+    - parent_name (parent/guardian name if visible)
+    - parent_phone (parent phone if visible)
+    - parent_email (parent email if visible)
 
-Return only extracted data. Use empty strings for fields not found.`,
-        file_urls: [file_url],
-        response_json_schema: {
-          type: 'object',
-          properties: {
-            condition_type: { type: 'string' },
-            allergens: { type: 'string' },
-            severity: { type: 'string' },
-            asthma_severity: { type: 'string' },
-            asthma_triggers: { type: 'string' },
-            reliever_medication: { type: 'string' },
-            preventer_medication: { type: 'string' },
-            trigger: { type: 'string' },
-            reaction: { type: 'string' },
-            control_measures: { type: 'string' },
-            medication_required: { type: 'string' },
-            medication_location: { type: 'string' },
-            dietary_requirement: { type: 'string' },
-            notes: { type: 'string' },
-            child_first_name: { type: 'string' },
-            child_last_name: { type: 'string' },
-            child_dob: { type: 'string' },
-            parent_name: { type: 'string' },
-            parent_phone: { type: 'string' },
-            parent_email: { type: 'string' },
-          },
-        },
-      });
+    Return only extracted data. Use empty strings for fields not found.`,
+         file_urls: [file_url],
+         response_json_schema: {
+           type: 'object',
+           properties: {
+             condition_type: { type: 'string' },
+             allergens: { type: 'string' },
+             severity: { type: 'string' },
+             asthma_severity: { type: 'string' },
+             asthma_triggers: { type: 'string' },
+             reliever_medication: { type: 'string' },
+             preventer_medication: { type: 'string' },
+             trigger: { type: 'string' },
+             reaction: { type: 'string' },
+             control_measures: { type: 'string' },
+             medications: {
+               type: 'array',
+               items: {
+                 type: 'object',
+                 properties: {
+                   name: { type: 'string' },
+                   at_service: { type: 'boolean' },
+                   at_home: { type: 'boolean' },
+                 },
+               },
+             },
+             dietary_requirement: { type: 'string' },
+             notes: { type: 'string' },
+             child_first_name: { type: 'string' },
+             child_last_name: { type: 'string' },
+             child_dob: { type: 'string' },
+             parent_name: { type: 'string' },
+             parent_phone: { type: 'string' },
+             parent_email: { type: 'string' },
+           },
+         },
+       });
 
-      onExtracted(result, { url: file_url, name: file.name });
+       onExtracted(result, { url: file_url, name: file.name });
     } catch {
       toast.error('AI extraction failed — you can still fill in the form manually');
       onSkip({ url: file_url, name: file.name });
