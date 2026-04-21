@@ -27,11 +27,7 @@ export default function RiskPlanForm() {
     reaction: '',
     risk_level: 'Medium',
     control_measures: '',
-    medication_required: '',
-    medication_location: '',
-    medication_expiry_date: '',
-    medication_supplied_by: '',
-    medication_supplied_date: '',
+    medications: [],
     review_date: '',
     status: 'Active',
   });
@@ -58,22 +54,21 @@ export default function RiskPlanForm() {
         reaction: p.reaction || '',
         risk_level: p.risk_level || 'Medium',
         control_measures: p.control_measures || '',
-        medication_required: p.medication_required || '',
-        medication_location: p.medication_location || '',
-        medication_expiry_date: p.medication_expiry_date || '',
-        medication_supplied_by: p.medication_supplied_by || '',
-        medication_supplied_date: p.medication_supplied_date || '',
+        medications: p.medications || [],
         review_date: p.review_date || '',
         status: p.status || 'Active',
       });
     } else if (childData[0] && !editPlanId) {
       const child = childData[0];
+      const extractedMeds = [];
+      if (child.reliever_medication) extractedMeds.push({ name: child.reliever_medication });
+      if (child.preventer_medication) extractedMeds.push({ name: child.preventer_medication });
       setForm(prev => ({
         ...prev,
         trigger: child.trigger || prev.trigger,
         reaction: child.reaction || prev.reaction,
         control_measures: child.control_measures || prev.control_measures,
-        medication_required: child.reliever_medication || child.preventer_medication || prev.medication_required,
+        medications: extractedMeds.length > 0 ? extractedMeds : prev.medications,
       }));
     }
   }, [existingPlans, childData, editPlanId]);
@@ -154,27 +149,44 @@ export default function RiskPlanForm() {
             <Label>Control Measures</Label>
             <Textarea value={form.control_measures} onChange={e => update('control_measures', e.target.value)} placeholder="Steps to minimise risk" rows={3} />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Medication Required</Label>
-              <Input value={form.medication_required} onChange={e => update('medication_required', e.target.value)} placeholder="e.g. EpiPen, Antihistamine" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Medication Location</Label>
-              <Input value={form.medication_location} onChange={e => update('medication_location', e.target.value)} placeholder="e.g. First Aid Room" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Medication Expiry Date</Label>
-              <Input type="date" value={form.medication_expiry_date} onChange={e => update('medication_expiry_date', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Supplied By</Label>
-              <Input value={form.medication_supplied_by} onChange={e => update('medication_supplied_by', e.target.value)} placeholder="e.g. Parent name" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Date Supplied</Label>
-              <Input type="date" value={form.medication_supplied_date} onChange={e => update('medication_supplied_date', e.target.value)} />
-            </div>
+
+          <div className="space-y-2">
+            <Label>Medications</Label>
+            <p className="text-xs text-muted-foreground">Add each medication individually. These will be confirmed with the parent.</p>
+            {(form.medications || []).map((med, idx) => (
+              <div key={idx} className="flex items-center gap-3 bg-muted/40 rounded-lg px-3 py-2">
+                <Input
+                  className="flex-1 bg-white"
+                  value={med.name}
+                  onChange={e => {
+                    const updated = [...(form.medications || [])];
+                    updated[idx] = { ...updated[idx], name: e.target.value };
+                    update('medications', updated);
+                  }}
+                  placeholder="e.g. Ventolin 2-4 puffs via spacer"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = (form.medications || []).filter((_, i) => i !== idx);
+                    update('medications', updated);
+                  }}
+                  className="text-red-400 hover:text-red-600 text-lg font-bold leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                update('medications', [...(form.medications || []), { name: '' }]);
+              }}
+            >
+              + Add Medication
+            </Button>
           </div>
         </Card>
 
