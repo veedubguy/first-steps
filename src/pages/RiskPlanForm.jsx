@@ -42,6 +42,12 @@ export default function RiskPlanForm() {
     enabled: !!editPlanId,
   });
 
+  const { data: childData = [] } = useQuery({
+    queryKey: ['child-riskform', childId],
+    queryFn: () => base44.entities.Children.filter({ id: childId }),
+    enabled: !!childId && !editPlanId,
+  });
+
   useEffect(() => {
     if (existingPlans[0]) {
       const p = existingPlans[0];
@@ -60,8 +66,17 @@ export default function RiskPlanForm() {
         review_date: p.review_date || '',
         status: p.status || 'Active',
       });
+    } else if (childData[0] && !editPlanId) {
+      const child = childData[0];
+      setForm(prev => ({
+        ...prev,
+        trigger: child.trigger || prev.trigger,
+        reaction: child.reaction || prev.reaction,
+        control_measures: child.control_measures || prev.control_measures,
+        medication_required: child.reliever_medication || child.preventer_medication || prev.medication_required,
+      }));
     }
-  }, [existingPlans]);
+  }, [existingPlans, childData, editPlanId]);
 
   const mutation = useMutation({
     mutationFn: (data) => editPlanId
