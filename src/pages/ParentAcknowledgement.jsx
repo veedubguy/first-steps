@@ -29,6 +29,7 @@ export default function ParentAcknowledgement() {
     control_measures: '',
   });
   const [medConfirmed, setMedConfirmed] = useState({});
+  const [medLocations, setMedLocations] = useState({});
 
   const { data: children = [], isLoading: lc } = useQuery({
     queryKey: ['ack-child', childId],
@@ -40,6 +41,12 @@ export default function ParentAcknowledgement() {
   const { data: riskPlans = [], isLoading: lr } = useQuery({
     queryKey: ['ack-plans', childId],
     queryFn: () => base44.entities.RiskPlans.filter({ child_id: childId }),
+    enabled: !!childId,
+  });
+
+  const { data: medications = [], isLoading: lm } = useQuery({
+    queryKey: ['ack-meds', childId],
+    queryFn: () => base44.entities.Medication.filter({ child_id: childId }),
     enabled: !!childId,
   });
 
@@ -103,6 +110,21 @@ export default function ParentAcknowledgement() {
         });
       }
 
+      // Update medications with parent-confirmed locations
+      for (const med of medications) {
+        const medKey = med.id;
+        const atService = medLocations[`${medKey}_service`] || false;
+        const atHome = medLocations[`${medKey}_home`] || false;
+        if (atService || atHome) {
+          await base44.entities.Medication.update(med.id, {
+            at_service: atService,
+            at_home: atHome,
+            parent_confirmed: true,
+            parent_confirmed_date: new Date().toISOString().split('T')[0],
+          });
+        }
+      }
+
       // Log the communication
       await base44.entities.CommunicationLog.create({
         child_id: childId,
@@ -129,7 +151,7 @@ export default function ParentAcknowledgement() {
     signMutation.mutate();
   };
 
-  const isLoading = lc || lr;
+  const isLoading = lc || lr || lm;
 
   if (isLoading) {
     return (
@@ -274,46 +296,38 @@ export default function ParentAcknowledgement() {
             </section>
           )}
 
-          {/* Asthma Medications — split by location with parent confirmation */}
-          {child.condition_type === 'Asthma' && child.asthma_medications && child.asthma_medications.length > 0 && (
+          {/* Medications from AI extraction — all condition types */}
+          {medications && medications.length > 0 && (
             <section>
               <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 rounded mb-3 text-gray-700">Medications</h2>
-              <p className="text-xs text-gray-500 px-3 mb-3">Please confirm you have provided the following medications as indicated.</p>
-
-              {/* At Service */}
-              {child.asthma_medications.some(m => m.at_service) && (
-                <div className="px-3 mb-4">
-                  <p className="text-xs font-bold uppercase text-blue-700 mb-2 tracking-wide">At Service (kept at childcare)</p>
-                  <div className="space-y-2">
-                    {child.asthma_medications.filter(m => m.at_service).map((med, idx) => (
-                      <label key={idx} className="flex items-start gap-3 cursor-pointer bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5">
+              <p className="text-xs text-gray-500 px-3 mb-3">Please indicate where each medication will be used:</p>
+              <div className="px-3 space-y-3">
+                {medications.map((med) => (
+                  <div key={med.id} className="border rounded-lg p-4 space-y-2">
+                    <p className="text-sm font-medium text-gray-900">{med.name}</p>
+                    <div className="flex items-center gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          className="mt-0.5 w-4 h-4 rounded border-gray-300"
-                          checked={!!medConfirmed[`service_${idx}_${med.name}`]}
-                          onChange={e => setMedConfirmed(prev => ({ ...prev, [`service_${idx}_${med.name}`]: e.target.checked }))}
+                          className="w-4 h-4 rounded border-gray-300"
+                          checked={medLocations[`${med.id}_service`] || false}
+                          onChange={e => setMedLocations(prev => ({ ...prev, [`${med.id}_service`]: e.target.checked }))}
                         />
-                        <span className="text-sm text-gray-800">{med.name}</span>
+                        <span className="text-sm text-gray-700">At Service</span>
                       </label>
-                    ))}
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 rounded border-gray-300"
+                          checked={medLocations[`${med.id}_home`] || false}
+                          onChange={e => setMedLocations(prev => ({ ...prev, [`${med.id}_home`]: e.target.checked }))}
+                        />
+                        <span className="text-sm text-gray-700">At Home</span>
+                      </label>
+                    </div>
                   </div>
-                </div>
-              )}
-
-              {/* At Home */}
-              {child.asthma_medications.some(m => m.at_home) && (
-                <div className="px-3">
-                  <p className="text-xs font-bold uppercase text-green-700 mb-2 tracking-wide">At Home only</p>
-                  <div className="space-y-2">
-                    {child.asthma_medications.filter(m => m.at_home && !m.at_service).map((med, idx) => (
-                      <div key={idx} className="bg-green-50 border border-green-100 rounded-lg px-3 py-2.5">
-                        <span className="text-sm text-gray-800">{med.name}</span>
-                        <span className="text-xs text-green-700 ml-2">(given at home only)</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                ))}
+              </div>
             </section>
           )}
 
