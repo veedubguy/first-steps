@@ -38,6 +38,12 @@ export default function RiskPlanForm() {
     enabled: !!editPlanId,
   });
 
+  const { data: existingMedRecords = [] } = useQuery({
+    queryKey: ['riskPlan-meds', editPlanId],
+    queryFn: () => base44.entities.Medication.filter({ risk_plan_id: editPlanId }),
+    enabled: !!editPlanId,
+  });
+
   const { data: childData = [] } = useQuery({
     queryKey: ['child-riskform', childId],
     queryFn: () => base44.entities.Children.filter({ id: childId }),
@@ -47,6 +53,10 @@ export default function RiskPlanForm() {
   useEffect(() => {
     if (existingPlans[0]) {
       const p = existingPlans[0];
+      // Use embedded medications if available, otherwise fall back to Medication entity records
+      const meds = (p.medications && p.medications.length > 0)
+        ? p.medications
+        : existingMedRecords.map(m => ({ name: m.name }));
       setForm({
         child_id: childId,
         trigger: p.trigger || '',
@@ -54,7 +64,7 @@ export default function RiskPlanForm() {
         reaction: p.reaction || '',
         risk_level: p.risk_level || 'Medium',
         control_measures: p.control_measures || '',
-        medications: p.medications || [],
+        medications: meds,
         review_date: p.review_date || '',
         status: p.status || 'Active',
       });
@@ -71,7 +81,7 @@ export default function RiskPlanForm() {
         medications: extractedMeds.length > 0 ? extractedMeds : prev.medications,
       }));
     }
-  }, [existingPlans, childData, editPlanId]);
+  }, [existingPlans, existingMedRecords, childData, editPlanId]);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
