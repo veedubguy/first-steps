@@ -80,7 +80,7 @@ export default function ChildForm() {
       }
 
       // If creating and we have risk plan data, create the risk plan too
-       if (!isEditing && (trigger || reaction || control_measures)) {
+       if (!isEditing && (trigger || reaction || control_measures || (medications && medications.length > 0))) {
          const riskPlan = await base44.entities.RiskPlans.create({
            child_id: child.id,
            trigger: trigger || '',
