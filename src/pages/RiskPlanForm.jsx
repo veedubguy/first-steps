@@ -88,6 +88,23 @@ export default function RiskPlanForm() {
       let riskPlan;
       if (editPlanId) {
         riskPlan = await base44.entities.RiskPlans.update(editPlanId, data);
+        // Sync Medication records: delete old ones and recreate from current list
+        const existingMeds = await base44.entities.Medication.filter({ risk_plan_id: editPlanId });
+        for (const med of existingMeds) {
+          await base44.entities.Medication.delete(med.id);
+        }
+        for (const med of (data.medications || [])) {
+          if (med.name) {
+            await base44.entities.Medication.create({
+              child_id: childId,
+              risk_plan_id: editPlanId,
+              name: med.name,
+              at_service: false,
+              at_home: false,
+              parent_confirmed: false,
+            });
+          }
+        }
       } else {
         riskPlan = await base44.entities.RiskPlans.create(data);
         // Create Medication records for each medication in the plan
