@@ -15,7 +15,6 @@ import { toast } from 'sonner';
 // ─── AI Import Helper ────────────────────────────────────────────────────────
 
 async function extractPlanFromDocument(file) {
-  // Convert HEIC/HEIF to JPEG — iPhones love sending these
   const isHeic = file.type === 'image/heic' || file.type === 'image/heif'
     || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
   if (isHeic) {
@@ -458,7 +457,7 @@ export default function RiskPlanForm() {
             <div className="space-y-1.5">
               <Label>Likelihood</Label>
               <p className="text-xs text-muted-foreground">How likely is exposure to occur?</p>
-              <Select value={form.likelihood} onValueChange={v => update('likelihood', v)}>
+              <Select value={form.likelihood || undefined} onValueChange={v => update('likelihood', v)}>
                 <SelectTrigger><SelectValue placeholder="Select likelihood" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Rare">Rare</SelectItem>
@@ -472,7 +471,7 @@ export default function RiskPlanForm() {
             <div className="space-y-1.5">
               <Label>Consequence</Label>
               <p className="text-xs text-muted-foreground">How severe if exposure occurs?</p>
-              <Select value={form.consequence} onValueChange={v => update('consequence', v)}>
+              <Select value={form.consequence || undefined} onValueChange={v => update('consequence', v)}>
                 <SelectTrigger><SelectValue placeholder="Select consequence" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Insignificant">Insignificant</SelectItem>
