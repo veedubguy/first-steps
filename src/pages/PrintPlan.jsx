@@ -43,6 +43,11 @@ export default function PrintPlan() {
     queryFn: () => base44.entities.RiskPlans.filter({ child_id: id }),
   });
 
+  const { data: medications = [] } = useQuery({
+    queryKey: ['medications', id],
+    queryFn: () => base44.entities.Medication.filter({ child_id: id }),
+  });
+
   const { data: planTracking = [] } = useQuery({
     queryKey: ['planTracking', id],
     queryFn: () => base44.entities.PlanTracking.filter({ child_id: id }),
@@ -114,11 +119,9 @@ export default function PrintPlan() {
 
   const handlePrint = () => {
     const container = document.getElementById('print-content');
-    // Clone so we can strip no-print elements and show sig lines
     const clone = container.cloneNode(true);
     clone.querySelectorAll('.no-print').forEach(el => el.remove());
     clone.querySelectorAll('.print-sig-line').forEach(el => { el.style.display = 'block'; });
-    // Remove screen-only borders/radius from pages
     clone.querySelectorAll('.print-page').forEach(el => {
       el.style.border = 'none';
       el.style.borderRadius = '0';
@@ -179,7 +182,7 @@ export default function PrintPlan() {
             <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1d4ed8', margin: '0 0 6px 0' }}>Risk Minimisation Plan</h1>
             <div style={{ fontSize: '10px', lineHeight: '1.7' }}>
               <div><strong>Centre Name:</strong> First Steps Before &amp; After School Care</div>
-              <div><strong>Child's Name:</strong> {childName} &nbsp;&nbsp;&nbsp; <strong>Date of Birth:</strong> {dob}</div>
+              <div><strong>Child's Name:</strong> {childName} &nbsp;&nbsp;&nbsp; <strong>Date of Birth:</strong> {dob} &nbsp;&nbsp;&nbsp; <strong>Room/Group:</strong> {child.room_group || '—'}</div>
               <div><strong>Diagnosed Medical Condition:</strong> {child.condition_type}</div>
               <div><strong>Date of Plan Implemented:</strong> {planImplementedDate} &nbsp;&nbsp;&nbsp; <strong>Review Date:</strong> {planReviewDate}</div>
             </div>
@@ -227,9 +230,9 @@ export default function PrintPlan() {
               <td style={{ ...TD, borderBottom: 'none' }} rowSpan={2}></td>
             </tr>
             <tr>
-              <td style={TD}>2.</td>
-              <td style={TD}></td>
-              <td style={TD}></td>
+              <td style={TD}>2. {child.emergency_contact_name || ''}</td>
+              <td style={TD}>{child.emergency_contact_phone || ''}</td>
+              <td style={TD}>{child.emergency_contact_relationship || ''}</td>
             </tr>
           </tbody>
         </table>
@@ -238,10 +241,12 @@ export default function PrintPlan() {
         <table style={{ ...TABLE, marginBottom: '12px' }}>
           <thead>
             <tr>
-              <th style={{ ...TH, width: '18%' }}>Trigger Mechanism</th>
-              <th style={{ ...TH, width: '20%' }}>Potential Sources / Times for Exposure</th>
-              <th style={{ ...TH, width: '18%' }}>Potential Reactions</th>
-              <th style={{ ...TH, width: '12%' }}>Risk Level</th>
+              <th style={{ ...TH, width: '16%' }}>Trigger Mechanism</th>
+              <th style={{ ...TH, width: '16%' }}>Potential Sources / Times for Exposure</th>
+              <th style={{ ...TH, width: '16%' }}>Potential Reactions</th>
+              <th style={{ ...TH, width: '10%' }}>Likelihood</th>
+              <th style={{ ...TH, width: '10%' }}>Consequence</th>
+              <th style={{ ...TH, width: '10%' }}>Risk Level</th>
               <th style={TH}>Strategies to Minimise Risk</th>
             </tr>
           </thead>
@@ -251,13 +256,15 @@ export default function PrintPlan() {
                 <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px' }}>{plan.trigger || ''}</td>
                 <td style={TD}>{plan.exposure_risk || ''}</td>
                 <td style={TD}>{plan.reaction || ''}</td>
+                <td style={{ ...TDC }}>{plan.likelihood || ''}</td>
+                <td style={{ ...TDC }}>{plan.consequence || ''}</td>
                 <td style={{ ...TD, fontWeight: 'bold', textAlign: 'center' }}>{plan.risk_level || ''}</td>
                 <td style={TD}>{plan.control_measures || ''}</td>
               </tr>
             )) : (
               <>
-                <tr>{[...Array(5)].map((_, i) => <td key={i} style={{ ...TD, height: '40px' }}></td>)}</tr>
-                <tr>{[...Array(5)].map((_, i) => <td key={i} style={{ ...TD, height: '40px' }}></td>)}</tr>
+                <tr>{[...Array(7)].map((_, i) => <td key={i} style={{ ...TD, height: '40px' }}></td>)}</tr>
+                <tr>{[...Array(7)].map((_, i) => <td key={i} style={{ ...TD, height: '40px' }}></td>)}</tr>
               </>
             )}
           </tbody>
@@ -278,48 +285,45 @@ export default function PrintPlan() {
         <table style={TABLE}>
           <thead>
             <tr>
-              <th style={{ ...TH, width: '20%' }}>Medication Name</th>
-              <th style={{ ...TH, width: '14%' }}>Expiry Date</th>
+              <th style={{ ...TH, width: '22%' }}>Medication Name</th>
+              <th style={{ ...TH, width: '12%' }}>Expiry Date</th>
               <th style={{ ...TH, width: '16%' }}>Supplied by &amp; Date</th>
-              <th style={{ ...TH, width: '18%' }}>Comments / Notes</th>
-              <th style={{ ...TH, width: '18%' }}>Location Kept</th>
+              <th style={{ ...TH, width: '16%' }}>Location</th>
+              <th style={{ ...TH, width: '16%' }}>Parent Confirmed</th>
               <th style={TH}>Checked by &amp; Date</th>
             </tr>
           </thead>
           <tbody>
-            {isAsthma && child.asthma_medications && child.asthma_medications.length > 0 ? (
+            {medications.length > 0 ? (
               <>
-                {child.asthma_medications.map((med, i) => (
-                  <tr key={i}>
-                    <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px' }}>{med.name}</td>
-                    <td style={TD}></td>
-                    <td style={TD}></td>
+                {medications.map((med) => (
+                  <tr key={med.id}>
+                    <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px', fontWeight: 'bold' }}>{med.name}</td>
+                    <td style={TD}>{med.expiry_date ? format(new Date(med.expiry_date), 'dd/MM/yyyy') : ''}</td>
                     <td style={TD}>
-                      {med.at_service && <span>✓ At Service</span>}
-                      {med.at_home && !med.at_service && <span>At Home only</span>}
-                      {med.at_service && med.at_home && <span>✓ At Service &amp; At Home</span>}
+                      {med.supplied_by || ''}
+                      {med.supplied_date ? ` – ${format(new Date(med.supplied_date), 'dd/MM/yyyy')}` : ''}
                     </td>
-                    <td style={TD}>{med.at_service ? activePlans[0]?.medication_location || '' : 'Home'}</td>
+                    <td style={TD}>
+                      {med.at_service && med.at_home ? '✓ At Service & At Home' :
+                       med.at_service ? '✓ At Service' :
+                       med.at_home ? 'At Home only' : '—'}
+                    </td>
+                    <td style={{ ...TDC, color: med.parent_confirmed ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
+                      {med.parent_confirmed
+                        ? `✓ ${med.parent_confirmed_date ? format(new Date(med.parent_confirmed_date), 'dd/MM/yyyy') : 'Yes'}`
+                        : 'Awaiting'}
+                    </td>
                     <td style={TD}></td>
                   </tr>
                 ))}
-                {[...Array(Math.max(0, 3 - child.asthma_medications.length))].map((_, i) => (
+                {[...Array(Math.max(0, 3 - medications.length))].map((_, i) => (
                   <tr key={i}>{[...Array(6)].map((_, j) => <td key={j} style={{ ...TD, height: '30px' }}></td>)}</tr>
                 ))}
               </>
             ) : (
               <>
-                {activePlans.filter(p => p.medication_required).map(plan => (
-                  <tr key={plan.id}>
-                    <td style={{ ...TD, paddingTop: '8px', paddingBottom: '8px' }}>{plan.medication_required}</td>
-                    <td style={TD}>{plan.medication_expiry_date ? format(new Date(plan.medication_expiry_date), 'dd/MM/yyyy') : ''}</td>
-                    <td style={TD}>{plan.medication_supplied_by || ''}{plan.medication_supplied_date ? ` – ${format(new Date(plan.medication_supplied_date), 'dd/MM/yyyy')}` : ''}</td>
-                    <td style={TD}></td>
-                    <td style={TD}>{plan.medication_location || ''}</td>
-                    <td style={TD}></td>
-                  </tr>
-                ))}
-                {[...Array(Math.max(3, 3 - activePlans.filter(p => p.medication_required).length))].map((_, i) => (
+                {[...Array(3)].map((_, i) => (
                   <tr key={i}>{[...Array(6)].map((_, j) => <td key={j} style={{ ...TD, height: '30px' }}></td>)}</tr>
                 ))}
               </>
@@ -346,11 +350,9 @@ export default function PrintPlan() {
               </thead>
               <tbody>
                 {(() => {
-                  const likelihoodOrder = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
                   const consequenceOrder = ['Insignificant', 'Minor', 'Moderate', 'Major', 'Extreme'];
                   const planLikelihood = activePlans[0]?.likelihood || '';
                   const planConsequence = activePlans[0]?.consequence || '';
-                  const highlightRow = planLikelihood ? planLikelihood.toUpperCase().replace(' ', '_') : null;
                   const highlightCol = planConsequence ? consequenceOrder.findIndex(c => c === planConsequence) : -1;
 
                   return [
@@ -363,7 +365,12 @@ export default function PrintPlan() {
                     const isHighlightRow = planLikelihood && row.key === planLikelihood;
                     return (
                       <tr key={row.label}>
-                        <td style={{ ...TD, fontWeight: 'bold', background: isHighlightRow ? '#1d4ed8' : '#f9fafb', color: isHighlightRow ? '#fff' : '#111', textAlign: 'center', fontSize: '9px' }}>{row.label}</td>
+                        <td style={{
+                          ...TD, fontWeight: 'bold',
+                          background: isHighlightRow ? '#1d4ed8' : '#f9fafb',
+                          color: isHighlightRow ? '#fff' : '#111',
+                          textAlign: 'center', fontSize: '9px'
+                        }}>{row.label}</td>
                         {row.cells.map((cell, i) => {
                           const isHighlight = isHighlightRow && i === highlightCol;
                           return (
@@ -473,7 +480,7 @@ export default function PrintPlan() {
           <tbody>
             {[
               { n: '1.', name: child.parent_name || '', rel: 'Parent/Guardian', ph: child.parent_phone || '' },
-              { n: '2.', name: '', rel: '', ph: '' },
+              { n: '2.', name: child.emergency_contact_name || '', rel: child.emergency_contact_relationship || '', ph: child.emergency_contact_phone || '' },
               { n: '3.', name: '', rel: '', ph: '' },
             ].map((r, i) => (
               <tr key={i}>
