@@ -27,6 +27,28 @@
       ],
       "description": "Risk level assessment"
     },
+    "likelihood": {
+      "type": "string",
+      "enum": [
+        "Rare",
+        "Unlikely",
+        "Possible",
+        "Likely",
+        "Almost Certain"
+      ],
+      "description": "Likelihood of exposure occurring"
+    },
+    "consequence": {
+      "type": "string",
+      "enum": [
+        "Insignificant",
+        "Minor",
+        "Moderate",
+        "Major",
+        "Extreme"
+      ],
+      "description": "Severity of consequence if exposure occurs"
+    },
     "control_measures": {
       "type": "string",
       "description": "Steps to minimise risk"

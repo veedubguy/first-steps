@@ -193,6 +193,8 @@ export default function RiskPlanForm() {
     exposure_risk: '',
     reaction: '',
     risk_level: 'Medium',
+    likelihood: '',
+    consequence: '',
     control_measures: '',
     medications: [],
     review_date: '',
@@ -233,6 +235,8 @@ export default function RiskPlanForm() {
         exposure_risk: p.exposure_risk || '',
         reaction: p.reaction || '',
         risk_level: p.risk_level || 'Medium',
+        likelihood: p.likelihood || '',
+        consequence: p.consequence || '',
         control_measures: p.control_measures || '',
         medications: meds,
         review_date: p.review_date || '',
@@ -448,6 +452,34 @@ export default function RiskPlanForm() {
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Review Due">Review Due</SelectItem>
                   <SelectItem value="Closed">Closed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Likelihood</Label>
+              <p className="text-xs text-muted-foreground">How likely is exposure to occur?</p>
+              <Select value={form.likelihood} onValueChange={v => update('likelihood', v)}>
+                <SelectTrigger><SelectValue placeholder="Select likelihood" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Rare">Rare</SelectItem>
+                  <SelectItem value="Unlikely">Unlikely</SelectItem>
+                  <SelectItem value="Possible">Possible</SelectItem>
+                  <SelectItem value="Likely">Likely</SelectItem>
+                  <SelectItem value="Almost Certain">Almost Certain</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Consequence</Label>
+              <p className="text-xs text-muted-foreground">How severe if exposure occurs?</p>
+              <Select value={form.consequence} onValueChange={v => update('consequence', v)}>
+                <SelectTrigger><SelectValue placeholder="Select consequence" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Insignificant">Insignificant</SelectItem>
+                  <SelectItem value="Minor">Minor</SelectItem>
+                  <SelectItem value="Moderate">Moderate</SelectItem>
+                  <SelectItem value="Major">Major</SelectItem>
+                  <SelectItem value="Extreme">Extreme</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -345,20 +345,43 @@ export default function PrintPlan() {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { label: 'RARE',          cells: ['LOW','LOW','LOW','MODERATE','HIGH'] },
-                  { label: 'UNLIKELY',      cells: ['LOW','LOW','MODERATE','HIGH','HIGH'] },
-                  { label: 'POSSIBLE',      cells: ['LOW','MODERATE','HIGH','HIGH','EXTREME'] },
-                  { label: 'LIKELY',        cells: ['MODERATE','MODERATE','HIGH','EXTREME','EXTREME'] },
-                  { label: 'ALMOST CERTAIN',cells: ['MODERATE','HIGH','HIGH','EXTREME','EXTREME'] },
-                ].map(row => (
-                  <tr key={row.label}>
-                    <td style={{ ...TD, fontWeight: 'bold', background: '#f9fafb', textAlign: 'center', fontSize: '9px' }}>{row.label}</td>
-                    {row.cells.map((cell, i) => (
-                      <td key={i} style={{ ...TDC, fontWeight: 'bold', fontSize: '9px', background: riskColor(cell) }}>{cell}</td>
-                    ))}
-                  </tr>
-                ))}
+                {(() => {
+                  const likelihoodOrder = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
+                  const consequenceOrder = ['Insignificant', 'Minor', 'Moderate', 'Major', 'Extreme'];
+                  const planLikelihood = activePlans[0]?.likelihood || '';
+                  const planConsequence = activePlans[0]?.consequence || '';
+                  const highlightRow = planLikelihood ? planLikelihood.toUpperCase().replace(' ', '_') : null;
+                  const highlightCol = planConsequence ? consequenceOrder.findIndex(c => c === planConsequence) : -1;
+
+                  return [
+                    { label: 'RARE',          key: 'Rare',          cells: ['LOW','LOW','LOW','MODERATE','HIGH'] },
+                    { label: 'UNLIKELY',      key: 'Unlikely',      cells: ['LOW','LOW','MODERATE','HIGH','HIGH'] },
+                    { label: 'POSSIBLE',      key: 'Possible',      cells: ['LOW','MODERATE','HIGH','HIGH','EXTREME'] },
+                    { label: 'LIKELY',        key: 'Likely',        cells: ['MODERATE','MODERATE','HIGH','EXTREME','EXTREME'] },
+                    { label: 'ALMOST CERTAIN',key: 'Almost Certain',cells: ['MODERATE','HIGH','HIGH','EXTREME','EXTREME'] },
+                  ].map(row => {
+                    const isHighlightRow = planLikelihood && row.key === planLikelihood;
+                    return (
+                      <tr key={row.label}>
+                        <td style={{ ...TD, fontWeight: 'bold', background: isHighlightRow ? '#1d4ed8' : '#f9fafb', color: isHighlightRow ? '#fff' : '#111', textAlign: 'center', fontSize: '9px' }}>{row.label}</td>
+                        {row.cells.map((cell, i) => {
+                          const isHighlight = isHighlightRow && i === highlightCol;
+                          return (
+                            <td key={i} style={{
+                              ...TDC, fontWeight: 'bold', fontSize: '9px',
+                              background: isHighlight ? '#1d4ed8' : riskColor(cell),
+                              color: isHighlight ? '#fff' : '#111',
+                              outline: isHighlight ? '3px solid #1d4ed8' : 'none',
+                              outlineOffset: '-2px',
+                            }}>
+                              {isHighlight ? `★ ${cell}` : cell}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  });
+                })()}
               </tbody>
             </table>
             <p style={{ fontSize: '9px', color: '#6b7280', fontStyle: 'italic', marginBottom: '6px' }}>
