@@ -15,6 +15,7 @@ import SendToStaffModal from '@/components/child-profile/SendToStaffModal';
 import StaffSignoffStatus from '@/components/child-profile/StaffSignoffStatus';
 import WorkflowTracker from '@/components/child-profile/WorkflowTracker';
 import DietaryIntakeView from '@/components/child-profile/DietaryIntakeView';
+import ParentObservationsView from '@/components/child-profile/ParentObservationsView';
 import { toast } from 'sonner';
 
 export default function ChildProfile() {
@@ -339,6 +340,14 @@ export default function ChildProfile() {
         <div>
           <h3 className="font-semibold text-sm mb-3">Dietary Intake (Parent Submitted)</h3>
           <DietaryIntakeView childId={id} />
+        </div>
+      )}
+
+      {/* Parent Observations — for Allergy & Asthma children */}
+      {child?.condition_type !== 'Dietary' && (
+        <div>
+          <h3 className="font-semibold text-sm mb-3">Parent Observations (Home)</h3>
+          <ParentObservationsView childId={id} />
         </div>
       )}
 

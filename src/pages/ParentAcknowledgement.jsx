@@ -28,6 +28,12 @@ export default function ParentAcknowledgement() {
     reaction: '',
     control_measures: '',
   });
+  const [parentObservations, setParentObservations] = useState({
+    parent_home_triggers: '',
+    parent_home_reaction: '',
+    parent_home_patterns: '',
+    parent_additional_notes: '',
+  });
   const [medConfirmed, setMedConfirmed] = useState({});
   const [medLocations, setMedLocations] = useState({});
 
@@ -122,6 +128,17 @@ export default function ParentAcknowledgement() {
             parent_confirmed: true,
             parent_confirmed_date: new Date().toISOString().split('T')[0],
           });
+        }
+      }
+
+      // Save parent observations to CommunicationPlan
+      const hasObservations = Object.values(parentObservations).some(v => v.trim());
+      if (hasObservations) {
+        const existingCommPlans = await base44.entities.CommunicationPlan.filter({ child_id: childId });
+        if (existingCommPlans[0]) {
+          await base44.entities.CommunicationPlan.update(existingCommPlans[0].id, parentObservations);
+        } else {
+          await base44.entities.CommunicationPlan.create({ child_id: childId, status: 'Centre Pending', ...parentObservations });
         }
       }
 
@@ -247,6 +264,52 @@ export default function ParentAcknowledgement() {
                   value={parentInput.control_measures}
                   onChange={e => handleParentInputChange('control_measures', e.target.value)}
                   className="h-20"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Parent Home Observations */}
+        {child.condition_type !== 'Dietary' && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-6 space-y-4">
+            <h2 className="font-bold text-gray-900">About Your Child at Home</h2>
+            <p className="text-sm text-gray-600">This information helps our staff better understand your child's condition and provide the best care.</p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">What triggers have you noticed at home?</label>
+                <Textarea
+                  placeholder="e.g. Being near cats, eating certain foods, cold weather..."
+                  value={parentObservations.parent_home_triggers}
+                  onChange={e => setParentObservations(prev => ({ ...prev, parent_home_triggers: e.target.value }))}
+                  className="h-20 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">How does your child typically react at home?</label>
+                <Textarea
+                  placeholder="e.g. Gets hives, starts coughing, becomes distressed..."
+                  value={parentObservations.parent_home_reaction}
+                  onChange={e => setParentObservations(prev => ({ ...prev, parent_home_reaction: e.target.value }))}
+                  className="h-20 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Any patterns or situations you've noticed?</label>
+                <Textarea
+                  placeholder="e.g. Worse in the morning, after exercise, during pollen season..."
+                  value={parentObservations.parent_home_patterns}
+                  onChange={e => setParentObservations(prev => ({ ...prev, parent_home_patterns: e.target.value }))}
+                  className="h-20 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Anything else the service should know?</label>
+                <Textarea
+                  placeholder="Any additional information that would help our staff care for your child..."
+                  value={parentObservations.parent_additional_notes}
+                  onChange={e => setParentObservations(prev => ({ ...prev, parent_additional_notes: e.target.value }))}
+                  className="h-20 bg-white"
                 />
               </div>
             </div>

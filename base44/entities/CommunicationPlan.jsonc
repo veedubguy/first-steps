@@ -1,0 +1,133 @@
+{
+  "name": "CommunicationPlan",
+  "type": "object",
+  "properties": {
+    "child_id": {
+      "type": "string",
+      "description": "Reference to child record ID"
+    },
+    "centre_staff_name": {
+      "type": "string",
+      "description": "Name of admin who completed the centre checklist"
+    },
+    "centre_completed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date centre completed their checklist"
+    },
+    "centre_check_1": {
+      "type": "boolean",
+      "description": "Nominated Supervisor will ensure all educators understand the medical conditions"
+    },
+    "centre_check_2": {
+      "type": "boolean",
+      "description": "Medical management plan is fully completed and accessible for all educators"
+    },
+    "centre_check_3": {
+      "type": "boolean",
+      "description": "Risk minimisation plan developed in consultation with guardians"
+    },
+    "centre_check_4": {
+      "type": "boolean",
+      "description": "Nominated supervisor will communicate any changes to educators"
+    },
+    "centre_check_5": {
+      "type": "boolean",
+      "description": "Medication stored out of reach and checked to meet policy requirements"
+    },
+    "centre_check_6": {
+      "type": "boolean",
+      "description": "Nominated supervisor will communicate attendance patterns to educators"
+    },
+    "centre_check_7": {
+      "type": "boolean",
+      "description": "Plans will be reviewed annually or when changes are identified"
+    },
+    "comm_pack_sent_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the communication pack was sent to parent"
+    },
+    "parent_check_1": {
+      "type": "boolean",
+      "description": "Medical Management plans are correct and current"
+    },
+    "parent_check_2": {
+      "type": "boolean",
+      "description": "If food related, notified centre of child requirements and menu alternatives"
+    },
+    "parent_check_3": {
+      "type": "boolean",
+      "description": "Risk minimisation plan developed in consultation with family and centre"
+    },
+    "parent_check_4": {
+      "type": "boolean",
+      "description": "Changes to medical condition will be communicated immediately to nominated supervisor"
+    },
+    "parent_check_5": {
+      "type": "boolean",
+      "description": "All medications will be on premises at all times, prescribed, in date, clearly labelled"
+    },
+    "parent_check_6": {
+      "type": "boolean",
+      "description": "Changes of attendance and absences will be notified to the centre"
+    },
+    "parent_check_7": {
+      "type": "boolean",
+      "description": "Plans will be reviewed annually or when changes are identified"
+    },
+    "parent_signed_name": {
+      "type": "string",
+      "description": "Parent name at time of comm plan signing"
+    },
+    "parent_signature_url": {
+      "type": "string",
+      "description": "URL of parent's signature for comm plan"
+    },
+    "parent_signed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date parent signed the communication plan"
+    },
+    "parent_home_triggers": {
+      "type": "string",
+      "description": "Triggers parent has observed at home"
+    },
+    "parent_home_reaction": {
+      "type": "string",
+      "description": "How child typically reacts at home based on parent observations"
+    },
+    "parent_home_patterns": {
+      "type": "string",
+      "description": "Patterns or situations parent has noticed that affect the condition"
+    },
+    "parent_additional_notes": {
+      "type": "string",
+      "description": "Any additional information the service should know about the child"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Centre Pending",
+        "Comm Pack Sent",
+        "Complete"
+      ],
+      "default": "Centre Pending",
+      "description": "Current status of the communication plan"
+    }
+  },
+  "required": [
+    "child_id",
+    "status"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
