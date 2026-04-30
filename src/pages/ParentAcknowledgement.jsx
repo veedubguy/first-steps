@@ -1,8 +1,18 @@
+I can see what base44's AI did — it added the green "About Your Child at Home" section correctly, but it **reverted** several of our changes:
+
+1. ❌ Photo is back to **optional** (not mandatory)
+2. ❌ Medication cards are back to **plain checkboxes** (not the styled cards)
+3. ❌ The old "Please Complete These Details" section is **still there** (should be removed)
+4. ❌ Missing the `Camera` icon import
+
+Here's the complete corrected file — paste this to fix everything:
+
+```jsx
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Loader2, AlertCircle, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,19 +32,12 @@ export default function ParentAcknowledgement() {
   const [signedDate] = useState(format(new Date(), 'dd/MM/yyyy'));
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const [parentInput, setParentInput] = useState({
-    trigger: '',
-    exposure_risk: '',
-    reaction: '',
-    control_measures: '',
-  });
   const [parentObservations, setParentObservations] = useState({
     parent_home_triggers: '',
     parent_home_reaction: '',
     parent_home_patterns: '',
     parent_additional_notes: '',
   });
-  const [medConfirmed, setMedConfirmed] = useState({});
   const [medLocations, setMedLocations] = useState({});
 
   const { data: children = [], isLoading: lc } = useQuery({
@@ -63,13 +66,11 @@ export default function ParentAcknowledgement() {
     setPhotoPreview(URL.createObjectURL(file));
   };
 
-  // Only use the single most recent active plan
   const allActivePlans = riskPlans.filter(p => p.status !== 'Closed');
   const activePlans = allActivePlans.slice(0, 1);
 
   const signMutation = useMutation({
     mutationFn: async () => {
-      // Upload the signature image
       let signatureUrl = null;
       if (parentSig) {
         const blob = await fetch(parentSig).then(r => r.blob());
@@ -78,7 +79,6 @@ export default function ParentAcknowledgement() {
         signatureUrl = result.file_url;
       }
 
-      // Upload the child photo if provided
       if (photoFile) {
         const photoResult = await base44.integrations.Core.UploadFile({ file: photoFile });
         await base44.entities.Children.update(childId, { photo_url: photoResult.file_url });
@@ -93,11 +93,9 @@ export default function ParentAcknowledgement() {
         notes: `Signed digitally by ${parentName}`,
       };
 
-      // Update plan tracking to Signed
       if (planTrackingId) {
         await base44.entities.PlanTracking.update(planTrackingId, sigData);
       } else {
-        // Create a new signed record
         await base44.entities.PlanTracking.create({
           child_id: childId,
           plan_type: child?.condition_type || 'Allergy',
@@ -105,33 +103,19 @@ export default function ParentAcknowledgement() {
         });
       }
 
-      // Update risk plans with parent input
-      if (activePlans.length > 0 && (parentInput.trigger || parentInput.exposure_risk || parentInput.reaction || parentInput.control_measures)) {
-        const plan = activePlans[0];
-        await base44.entities.RiskPlans.update(plan.id, {
-          trigger: parentInput.trigger || plan.trigger,
-          exposure_risk: parentInput.exposure_risk || plan.exposure_risk,
-          reaction: parentInput.reaction || plan.reaction,
-          control_measures: parentInput.control_measures || plan.control_measures,
+      // Update medications with parent-confirmed locations
+      for (const med of medications) {
+        const atService = medLocations[`${med.id}_service`] || false;
+        const atHome = medLocations[`${med.id}_home`] || false;
+        await base44.entities.Medication.update(med.id, {
+          at_service: atService,
+          at_home: atHome,
+          parent_confirmed: true,
+          parent_confirmed_date: new Date().toISOString().split('T')[0],
         });
       }
 
-      // Update medications with parent-confirmed locations
-      for (const med of medications) {
-        const medKey = med.id;
-        const atService = medLocations[`${medKey}_service`] || false;
-        const atHome = medLocations[`${medKey}_home`] || false;
-        if (atService || atHome) {
-          await base44.entities.Medication.update(med.id, {
-            at_service: atService,
-            at_home: atHome,
-            parent_confirmed: true,
-            parent_confirmed_date: new Date().toISOString().split('T')[0],
-          });
-        }
-      }
-
-      // Save parent observations to CommunicationPlan
+      // Save parent home observations to CommunicationPlan
       const hasObservations = Object.values(parentObservations).some(v => v.trim());
       if (hasObservations) {
         const existingCommPlans = await base44.entities.CommunicationPlan.filter({ child_id: childId });
@@ -142,7 +126,6 @@ export default function ParentAcknowledgement() {
         }
       }
 
-      // Log the communication
       await base44.entities.CommunicationLog.create({
         child_id: childId,
         date: new Date().toISOString().split('T')[0],
@@ -163,6 +146,7 @@ export default function ParentAcknowledgement() {
     e.preventDefault();
     if (!parentName.trim()) { setError('Please enter your full name.'); return; }
     if (!agreed) { setError('Please check the acknowledgement box.'); return; }
+    if (!photoFile) { setError('A photo of your child is required for identification.'); return; }
     if (!parentSig) { setError('Please sign before submitting.'); return; }
     setError('');
     signMutation.mutate();
@@ -208,15 +192,12 @@ export default function ParentAcknowledgement() {
     );
   }
 
-  const handleParentInputChange = (field, value) => {
-    setParentInput(prev => ({ ...prev, [field]: value }));
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
-         {/* Header */}
-         <div className="text-center">
+
+        {/* Header */}
+        <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
             {child.condition_type === 'Allergy' ? 'Allergy Risk Minimisation Plan' :
              child.condition_type === 'Asthma' ? 'Asthma Management Plan' :
@@ -226,55 +207,13 @@ export default function ParentAcknowledgement() {
           <p className="text-gray-500 mt-1">Please review and acknowledge this plan for your child</p>
         </div>
 
-        {/* Parent Input Section — not shown for Dietary (they have their own form) */}
-        {activePlans.length > 0 && child.condition_type !== 'Dietary' && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-4">
-            <h2 className="font-bold text-gray-900">Please Complete These Details</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">What is the trigger? *</label>
-                <Input
-                  placeholder="e.g. Peanuts, dairy, exercise..."
-                  value={parentInput.trigger}
-                  onChange={e => handleParentInputChange('trigger', e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">How might exposure occur?</label>
-                <Textarea
-                  placeholder="e.g. Through food contact, airborne particles..."
-                  value={parentInput.exposure_risk}
-                  onChange={e => handleParentInputChange('exposure_risk', e.target.value)}
-                  className="h-20"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">What is the expected reaction?</label>
-                <Textarea
-                  placeholder="e.g. Rash, swelling, difficulty breathing..."
-                  value={parentInput.reaction}
-                  onChange={e => handleParentInputChange('reaction', e.target.value)}
-                  className="h-20"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">What control measures should be in place?</label>
-                <Textarea
-                  placeholder="e.g. Avoid certain foods, have medication available..."
-                  value={parentInput.control_measures}
-                  onChange={e => handleParentInputChange('control_measures', e.target.value)}
-                  className="h-20"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Parent Home Observations */}
+        {/* About Your Child at Home */}
         {child.condition_type !== 'Dietary' && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-6 space-y-4">
-            <h2 className="font-bold text-gray-900">About Your Child at Home</h2>
-            <p className="text-sm text-gray-600">This information helps our staff better understand your child's condition and provide the best care.</p>
+            <div>
+              <h2 className="font-bold text-gray-900">About Your Child at Home</h2>
+              <p className="text-sm text-gray-600 mt-1">This helps our staff better understand your child's condition from your experience. All fields are optional.</p>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">What triggers have you noticed at home?</label>
@@ -318,6 +257,7 @@ export default function ParentAcknowledgement() {
 
         {/* Plan Document */}
         <div className="bg-white border rounded-xl p-6 space-y-6 shadow-sm">
+
           {/* Child Details */}
           <section>
             <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 rounded mb-3 text-gray-700">Child Details</h2>
@@ -338,54 +278,54 @@ export default function ParentAcknowledgement() {
             </div>
           </section>
 
-          {/* Risk Plans — only show the first (most recent) plan */}
+          {/* Risk Plan */}
           {activePlans.length > 0 && (
             <section>
               <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 rounded mb-3 text-gray-700">Risk Minimisation Plan</h2>
-              {activePlans[0] && (
-                <div className="px-3 mb-4 text-sm">
-                  <div className="space-y-1.5 text-sm">
-                    <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Trigger:</span><span>{activePlans[0].trigger}</span></div>
-                    {activePlans[0].exposure_risk && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Exposure Risk:</span><span>{activePlans[0].exposure_risk}</span></div>}
-                    {activePlans[0].reaction && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Reaction:</span><span>{activePlans[0].reaction}</span></div>}
-                    <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Risk Level:</span><span className="font-semibold">{activePlans[0].risk_level}</span></div>
-                    {activePlans[0].control_measures && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Control Measures:</span><span>{activePlans[0].control_measures}</span></div>}
-                    {activePlans[0].medication_required && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Medication:</span><span>{activePlans[0].medication_required}</span></div>}
-                    {activePlans[0].medication_location && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Stored At:</span><span>{activePlans[0].medication_location}</span></div>}
-                    {activePlans[0].review_date && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Review Date:</span><span>{format(new Date(activePlans[0].review_date), 'dd/MM/yyyy')}</span></div>}
-                  </div>
-                </div>
-              )}
+              <div className="px-3 space-y-1.5 text-sm">
+                <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Trigger:</span><span>{activePlans[0].trigger}</span></div>
+                {activePlans[0].exposure_risk && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Exposure Risk:</span><span>{activePlans[0].exposure_risk}</span></div>}
+                {activePlans[0].reaction && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Reaction:</span><span>{activePlans[0].reaction}</span></div>}
+                <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Risk Level:</span><span className="font-semibold">{activePlans[0].risk_level}</span></div>
+                {activePlans[0].control_measures && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Control Measures:</span><span>{activePlans[0].control_measures}</span></div>}
+                {activePlans[0].review_date && <div className="flex gap-2"><span className="font-medium w-36 shrink-0">Review Date:</span><span>{format(new Date(activePlans[0].review_date), 'dd/MM/yyyy')}</span></div>}
+              </div>
             </section>
           )}
 
-          {/* Medications from AI extraction — all condition types */}
-          {medications && medications.length > 0 && (
+          {/* Medications */}
+          {medications.length > 0 && (
             <section>
               <h2 className="text-sm font-bold uppercase bg-gray-100 px-3 py-1.5 rounded mb-3 text-gray-700">Medications</h2>
-              <p className="text-xs text-gray-500 px-3 mb-3">Please indicate where each medication will be used:</p>
+              <p className="text-xs text-gray-500 px-3 mb-3">Please confirm each medication and indicate where it will be administered:</p>
               <div className="px-3 space-y-3">
                 {medications.map((med) => (
-                  <div key={med.id} className="border rounded-lg p-4 space-y-2">
-                    <p className="text-sm font-medium text-gray-900">{med.name}</p>
-                    <div className="flex items-center gap-6">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                  <div key={med.id} className="border rounded-lg p-4 space-y-3 bg-gray-50">
+                    <p className="text-sm font-semibold text-gray-900">{med.name}</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${medLocations[`${med.id}_service`] ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-white'}`}>
                         <input
                           type="checkbox"
-                          className="w-4 h-4 rounded border-gray-300"
+                          className="w-4 h-4"
                           checked={medLocations[`${med.id}_service`] || false}
                           onChange={e => setMedLocations(prev => ({ ...prev, [`${med.id}_service`]: e.target.checked }))}
                         />
-                        <span className="text-sm text-gray-700">At Service</span>
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">At Service</p>
+                          <p className="text-xs text-gray-500">Kept at OSHC</p>
+                        </div>
                       </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${medLocations[`${med.id}_home`] ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-white'}`}>
                         <input
                           type="checkbox"
-                          className="w-4 h-4 rounded border-gray-300"
+                          className="w-4 h-4"
                           checked={medLocations[`${med.id}_home`] || false}
                           onChange={e => setMedLocations(prev => ({ ...prev, [`${med.id}_home`]: e.target.checked }))}
                         />
-                        <span className="text-sm text-gray-700">At Home</span>
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">At Home</p>
+                          <p className="text-xs text-gray-500">Kept at home</p>
+                        </div>
                       </label>
                     </div>
                   </div>
@@ -406,13 +346,10 @@ export default function ParentAcknowledgement() {
         <div className="bg-white border rounded-xl p-6 shadow-sm">
           <h2 className="font-bold text-gray-900 mb-4">Parent / Guardian Acknowledgement</h2>
           <form onSubmit={handleSubmit} className="space-y-5">
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Full Name</label>
-              <Input
-                placeholder="e.g. Jane Smith"
-                value={parentName}
-                onChange={e => setParentName(e.target.value)}
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Full Name *</label>
+              <Input placeholder="e.g. Jane Smith" value={parentName} onChange={e => setParentName(e.target.value)} />
             </div>
 
             <label className="flex items-start gap-3 cursor-pointer">
@@ -427,10 +364,11 @@ export default function ParentAcknowledgement() {
               </span>
             </label>
 
-            {/* Photo Upload */}
+            {/* Photo Upload — MANDATORY */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Child's Photo <span className="text-gray-400 font-normal">(optional — used for identification on the care plan)</span>
+                Child's Photo <span className="text-red-500">* Required</span>
+                <span className="text-gray-400 font-normal"> — used for identification on the care plan</span>
               </label>
               {photoPreview ? (
                 <div className="flex items-center gap-4">
@@ -440,25 +378,29 @@ export default function ParentAcknowledgement() {
                   </button>
                 </div>
               ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 transition-colors"
-                  onClick={() => document.getElementById('parent-photo-upload').click()}>
-                  <p className="text-sm text-gray-500">Tap to upload a photo of your child</p>
-                  <p className="text-xs text-gray-400 mt-1">JPG, PNG accepted</p>
+                <div
+                  className="border-2 border-dashed border-red-300 bg-red-50 rounded-lg p-5 text-center cursor-pointer hover:border-red-400 transition-colors"
+                  onClick={() => document.getElementById('parent-photo-upload').click()}
+                >
+                  <Camera className="w-8 h-8 text-red-400 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-red-700">Tap to upload a photo of your child</p>
+                  <p className="text-xs text-red-400 mt-1">JPG, PNG, HEIC accepted — required to submit</p>
                   <input id="parent-photo-upload" type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
                 </div>
               )}
             </div>
 
+            {/* Signature */}
             <div>
               {parentSig ? (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-1">Your Signature:</p>
+                  <p className="text-sm font-medium text-gray-700 mb-1">Your Signature: *</p>
                   <img src={parentSig} alt="Signature" className="h-16 border-b border-gray-400 w-full object-contain object-left" />
                   <p className="text-xs text-gray-500 mt-1">Signed: {signedDate}</p>
                   <button type="button" onClick={() => setParentSig(null)} className="text-xs text-blue-600 underline mt-1">Clear signature</button>
                 </div>
               ) : (
-                <SignaturePad label="Your Signature:" onSave={setParentSig} />
+                <SignaturePad label="Your Signature: *" onSave={setParentSig} />
               )}
             </div>
 
@@ -469,16 +411,11 @@ export default function ParentAcknowledgement() {
               </div>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={signMutation.isPending}
-            >
-              {signMutation.isPending ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
-              ) : (
-                <><CheckCircle2 className="w-4 h-4" /> Submit Acknowledgement</>
-              )}
+            <Button type="submit" className="w-full" disabled={signMutation.isPending}>
+              {signMutation.isPending
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                : <><CheckCircle2 className="w-4 h-4" /> Submit Acknowledgement</>
+              }
             </Button>
           </form>
         </div>
